@@ -1,0 +1,10 @@
+black
+debugpy
+ipython
+isort
+jedi==0.17.2
+pylint
+pyls-black
+pyls-isort
+pytest
+python-language-server>=0.36.2
