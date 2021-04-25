@@ -1,8 +1,11 @@
+import logging
 import os
 import tempfile
 from ftplib import FTP
 
+from .logger import getLogger
 
+logger = getLogger("nasdaq")
 
 
 def download():
@@ -15,6 +18,7 @@ def download():
     ftp = FTP("ftp.nasdaqtrader.com")
 
     # ...login anonymously.
+    logger.info("Logging in to ftp.nasdaqtrader.com anonymously...")
     ftp.login()
     ftp.makepasv()
 
@@ -28,13 +32,16 @@ def download():
     os.close(handle)
 
     # Download symbol list
+    logger.info("Downloading nasdaqtraded.txt...")
     with open(filename, "wb") as infile:
         ftp.retrbinary("RETR nasdaqtraded.txt", infile.write)
 
     # Close ftp connection.
+    logger.info("Disconecting from ftp.nasdaqtrader.com.")
     ftp.quit()
 
     # Now let's parse the file.
+    logger.info("Parsing downloaded nasdaqtraded.txt...")
     with open(filename, "r") as infile:
         # Skip header and footer.
         nasdaqtraded = infile.readlines()[1:-1]
@@ -57,6 +64,8 @@ def download():
 
     # Remove temporary file.
     os.remove(filename)
+
+    logger.info(f"{len(symbols)} symbols found.")
 
     # Sort by symbol name.
     return sorted(symbols, key=lambda s: s[0])
