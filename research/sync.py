@@ -1,10 +1,10 @@
 import logging
 
-from research import nasdaq
-from research.db.models import Ticker
-from research.logger import getLogger
+from . import nasdaq
+from .db.models import Ticker
+from .logger import getLogger
 
-logger = getLogger("nasdaq")
+logger = getLogger("sync")
 
 
 def symbols():
@@ -14,15 +14,10 @@ def symbols():
     nasdaq_symbols = nasdaq.download()
     logger.info(f"{len(nasdaq_symbols)} fetched.")
 
-    saved = 0
-    new = 0
     logger.info("Syncing symbols into the database.")
+    saved = 0
     for symbol in nasdaq_symbols:
-        ticker = Ticker.where("symbol", "=", symbol[0]).first()
-
-        if not ticker:
-            ticker = Ticker()
-            new += 1
+        ticker = Ticker.by_symbol_or_new(symbol[0])
 
         ticker.symbol = symbol[0]
         ticker.name = symbol[1]
@@ -34,4 +29,4 @@ def symbols():
         if ticker.save():
             saved += 1
 
-    logger.info(f"Tickers sync finished, saved={saved} new={new}.")
+    logger.info(f"Tickers sync finished, saved={saved}.")
