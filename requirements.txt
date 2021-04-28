@@ -1,2 +1,3 @@
 orator
 psycopg2
+requests
