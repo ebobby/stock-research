@@ -21,29 +21,24 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: tickers; Type: TABLE; Schema: public; Owner: stocks
+-- Name: etfs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.tickers (
+CREATE TABLE public.etfs (
     id integer NOT NULL,
     symbol text NOT NULL,
     name text NOT NULL,
-    exchange character(1) NOT NULL,
-    etf boolean NOT NULL,
-    status character(1) NOT NULL,
-    cqs text NOT NULL,
+    deleted_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone NOT NULL
 );
 
 
-ALTER TABLE public.tickers OWNER TO stocks;
-
 --
--- Name: tickers_id_seq; Type: SEQUENCE; Schema: public; Owner: stocks
+-- Name: etfs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.tickers_id_seq
+CREATE SEQUENCE public.etfs_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -52,35 +47,73 @@ CREATE SEQUENCE public.tickers_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tickers_id_seq OWNER TO stocks;
-
 --
--- Name: tickers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: stocks
+-- Name: etfs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.tickers_id_seq OWNED BY public.tickers.id;
+ALTER SEQUENCE public.etfs_id_seq OWNED BY public.etfs.id;
 
 
 --
--- Name: tickers id; Type: DEFAULT; Schema: public; Owner: stocks
+-- Name: stocks; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.tickers ALTER COLUMN id SET DEFAULT nextval('public.tickers_id_seq'::regclass);
+CREATE TABLE public.stocks (
+    id integer NOT NULL,
+    symbol text NOT NULL,
+    name text NOT NULL,
+    deleted_at timestamp with time zone,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone NOT NULL
+);
 
 
 --
--- Name: tickers tickers_pkey; Type: CONSTRAINT; Schema: public; Owner: stocks
+-- Name: stocks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.tickers
-    ADD CONSTRAINT tickers_pkey PRIMARY KEY (id);
+CREATE SEQUENCE public.stocks_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
 --
--- Name: idx_tickers_symbol; Type: INDEX; Schema: public; Owner: stocks
+-- Name: stocks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-CREATE INDEX idx_tickers_symbol ON public.tickers USING btree (symbol);
+ALTER SEQUENCE public.stocks_id_seq OWNED BY public.stocks.id;
+
+
+--
+-- Name: etfs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.etfs ALTER COLUMN id SET DEFAULT nextval('public.etfs_id_seq'::regclass);
+
+
+--
+-- Name: stocks id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stocks ALTER COLUMN id SET DEFAULT nextval('public.stocks_id_seq'::regclass);
+
+
+--
+-- Name: idx_etfs_symbol; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_etfs_symbol ON public.etfs USING btree (symbol);
+
+
+--
+-- Name: idx_stocks_symbol; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_stocks_symbol ON public.stocks USING btree (symbol);
 
 
 --

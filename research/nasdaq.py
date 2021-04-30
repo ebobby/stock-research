@@ -10,9 +10,7 @@ logger = getLogger("nasdaq")
 
 def download():
     """Download the most recent list of symbols from NASDAQ
-    and returns a list of tuples with the data:
-
-    (symbol, name, exchange, etf, status, cqs)"""
+    and returns a tuple of etfs and stocks with the data: (symbol, name)"""
 
     # Nasdaq has a list of all symbols available...
     ftp = FTP("ftp.nasdaqtrader.com")
@@ -47,25 +45,25 @@ def download():
         nasdaqtraded = infile.readlines()[1:-1]
 
     # Sample: sample-data/nasdaqtraded.txt
-    symbols = []
+    stocks = []
+    etfs = []
     for line in nasdaqtraded:
         parts = line.split("|")
-        if parts[7] != "Y":
-            symbols.append(
-                (
-                    parts[1],
-                    parts[2],
-                    parts[3],
-                    parts[5] == "Y",
-                    parts[8],
-                    parts[9],
-                )
-            )
+
+        # If not a test symbol and status is normal then add to list...
+        if parts[7] != "Y" and (parts[8] == "" or parts[8] == "N"):
+            # etf or stock?
+            if parts[5] == "Y":
+                etfs.append((parts[1], parts[2]))
+            else:
+                stocks.append((parts[1], parts[2]))
 
     # Remove temporary file.
     os.remove(filename)
 
-    logger.info(f"{len(symbols)} symbols found.")
+    logger.info(
+        f"{len(etfs) + len(stocks)} symbols found, {len(etfs)} etfs and {len(stocks)} stocks."
+    )
 
     # Sort by symbol name.
-    return sorted(symbols, key=lambda s: s[0])
+    return sorted(stocks), sorted(etfs)
