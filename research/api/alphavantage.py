@@ -4,6 +4,7 @@
 import os
 
 import requests
+from ratelimit import limits, sleep_and_retry
 from requests.exceptions import RequestException
 
 __author__ = "Francisco Soto"
@@ -18,6 +19,8 @@ class AlphaVantage:
     def __init__(self, api_key=None):
         self._api_key = api_key or os.environ.get(self.API_KEY_ENV, "")
 
+    @sleep_and_retry
+    @limits(calls=75, period=60)
     def _call_function(self, function, **kwargs):
         try:
             params = {"apikey": self._api_key, "function": function}
