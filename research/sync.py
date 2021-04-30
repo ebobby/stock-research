@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+"""Provides syncing facilities to populate and update the database data."""
+
 import logging
 from itertools import groupby
 
@@ -5,11 +8,12 @@ from . import nasdaq
 from .db.models import Etf, Stock
 from .logger import getLogger
 
-logger = getLogger("sync")
+__author__ = "Francisco Soto"
 
 
-def symbols():
-    """Sync symbols from NASDAQ into the database."""
+def nasdaq_symbols():
+    """Import symbols from NASDAQ into the database."""
+    logger = getLogger("ticker sync")
 
     def save_list(model, symbols):
         logger.info(f"Syncing {model.__name__.lower()}s into the database.")
@@ -26,7 +30,7 @@ def symbols():
     logger.info("Fetching current symbol list from NASDAQ.")
 
     # Download tickers list from nasdaq and sort them into etfs and stocks.
-    stocks, etfs = nasdaq.download()
+    stocks, etfs = nasdaq.download_traded()
 
     save_list(Stock, stocks)
     save_list(Etf, etfs)

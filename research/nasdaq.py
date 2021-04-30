@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+"""NASDAQ related utilities."""
+
 import logging
 import os
 import tempfile
@@ -5,12 +8,13 @@ from ftplib import FTP
 
 from .logger import getLogger
 
-logger = getLogger("nasdaq")
+__author__ = "Francisco Soto"
 
 
-def download():
-    """Download the most recent list of symbols from NASDAQ
+def download_traded():
+    """Download the most recent list of traded tickers from NASDAQ
     and returns a tuple of etfs and stocks with the data: (symbol, name)"""
+    logger = getLogger("nasdaq")
 
     # Nasdaq has a list of all symbols available...
     ftp = FTP("ftp.nasdaqtrader.com")

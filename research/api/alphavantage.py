@@ -1,7 +1,12 @@
+#!/usr/bin/env python
+"""AlphaVantage API wrapper."""
+
 import os
 
 import requests
 from requests.exceptions import RequestException
+
+__author__ = "Francisco Soto"
 
 
 class AlphaVantage:

@@ -1,9 +1,15 @@
+#!/usr/bin/env python
+"""Logging facilities."""
+
 import logging
 import os
 import sys
 
+__author__ = "Francisco Soto"
+
 
 def getLogger(name):
+    """Returns a tagged logger object that outputs to STDOUT."""
     logger = logging.getLogger(name)
 
     logger.setLevel(
