@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+pg_dump --user stocks -O -s -x --no-comments stock-research > db/schema.sql
+pg_dump --user stocks -a --inserts --no-comments -t migrations stock-research >> db/schema.sql

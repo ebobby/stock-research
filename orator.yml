@@ -1,0 +1,7 @@
+databases:
+  stock-research:
+    driver: postgres
+    host: localhost
+    database: stock-research
+    user: stocks
+    password: research
