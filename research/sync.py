@@ -5,7 +5,7 @@ import logging
 from itertools import groupby
 
 from . import nasdaq
-from .db.models import Etf, Stock
+from .db.models import Stock
 from .logger import getLogger
 
 __author__ = "Francisco Soto"
@@ -30,7 +30,6 @@ def nasdaq_symbols():
     logger.info("Fetching current symbol list from NASDAQ.")
 
     # Download tickers list from nasdaq and sort them into etfs and stocks.
-    stocks, etfs = nasdaq.download_traded()
+    stocks, _ = nasdaq.download_traded()
 
     save_list(Stock, stocks)
-    save_list(Etf, etfs)
