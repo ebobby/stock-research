@@ -11,7 +11,7 @@ from .logger import getLogger
 __author__ = "Francisco Soto"
 
 
-def nasdaq_symbols():
+def nasdaq_stocks():
     """Import symbols from NASDAQ into the database."""
     logger = getLogger("ticker sync")
 
@@ -19,7 +19,7 @@ def nasdaq_symbols():
         logger.info(f"Syncing {model.__name__.lower()}s into the database.")
         saved = 0
         for symbol in symbols:
-            instance = model.by_symbol_or_new(symbol[0])
+            instance = model.where_symbol(symbol[0]).first() or Stock()
             instance.symbol = symbol[0]
             instance.name = symbol[1]
 

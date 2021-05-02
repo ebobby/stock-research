@@ -10,8 +10,3 @@ class Stock(SoftDeletes, Model):
     """Stock/Shares ORM model."""
 
     __dates__ = ["deleted_at"]
-
-    @staticmethod
-    def by_symbol_or_new(symbol):
-        """Find stock by symbol or return a new object."""
-        return Stock.where("symbol", "=", symbol).first() or Stock()
