@@ -5,7 +5,7 @@ import logging
 from itertools import groupby
 
 from . import nasdaq
-from .db.models import Stock
+from .db.model import Stock
 from .logger import getLogger
 
 __author__ = "Francisco Soto"
