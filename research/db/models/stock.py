@@ -2,7 +2,7 @@
 """Stock/Shares ORM model."""
 
 from orator import Model, SoftDeletes
-from orator.orm import has_one
+from orator.orm import has_many, has_one
 
 __author__ = "Francisco Soto"
 
@@ -18,3 +18,10 @@ class Stock(SoftDeletes, Model):
         from .company import Company
 
         return Company
+
+    @has_many
+    def summaries(self):
+        """The company summaries."""
+        from .summary import Summary
+
+        return Summary
