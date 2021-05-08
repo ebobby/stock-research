@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+#; -*- mode: sh;-*-
+
+dropdb --user stocks stock-research
+createdb --user stocks stock-research

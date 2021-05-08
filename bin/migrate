@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#; -*- mode: sh;-*-
+
+orator migrate -p db/migrations -f -vv
