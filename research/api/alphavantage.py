@@ -11,7 +11,7 @@ __author__ = "Francisco Soto"
 
 
 class AlphaVantage:
-    """Lightweight wrapper for Alpha Vantage API."""
+    """Lightweight wrapper for Alpha Vantage's API."""
 
     API_KEY_ENV = "ALPHAVANTAGE_API_KEY"
     BASE_URL = "https://www.alphavantage.co/query"
