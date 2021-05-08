@@ -8,12 +8,22 @@ class CreateStocksTable(Migration):
         """
         with self.schema.create("stocks") as table:
             table.increments("id")
-            table.text("symbol")
+
+            # Data
+            table.text("ticker")
             table.text("name")
+            table.text("locale")
+            table.text("currency")
+            table.text("exchange")
+            table.text("cik")
+            table.boolean("active")
+
+            # Timestamps
             table.soft_deletes()
             table.timestamps()
 
-            table.unique("symbol")
+            # Indexes
+            table.unique("ticker")
 
     def down(self):
         """
