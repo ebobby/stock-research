@@ -2,13 +2,19 @@
 """Stock/Shares ORM model."""
 
 from orator import Model
-from orator.orm import accessor
+from orator.orm import accessor, has_many
 
 __author__ = "Francisco Soto"
 
 
 class Stock(Model):
     """Stock/Shares ORM model."""
+
+    @has_many
+    def daily_prices(self):
+        from .daily_price import DailyPrice
+
+        return DailyPrice
 
     @accessor
     def ticker_for_alpha_vantage(self):
