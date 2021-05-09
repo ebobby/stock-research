@@ -16,6 +16,8 @@ class AlphaVantage:
     API_KEY_ENV = "ALPHAVANTAGE_API_KEY"
     BASE_URL = "https://www.alphavantage.co/query"
 
+    DATE_FORMAT = "%Y-%m-%d"
+
     def __init__(self, api_key=None):
         self._api_key = api_key or os.environ.get(self.API_KEY_ENV, "")
 
