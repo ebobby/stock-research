@@ -19,7 +19,6 @@ class CreateStocksTable(Migration):
             table.boolean("active")
 
             # Timestamps
-            table.soft_deletes()
             table.timestamps()
 
             # Indexes

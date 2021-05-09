@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 """Stock/Shares ORM model."""
 
-from orator import Model, SoftDeletes
+from orator import Model
 from orator.orm import accessor
 
 __author__ = "Francisco Soto"
 
 
-class Stock(SoftDeletes, Model):
+class Stock(Model):
     """Stock/Shares ORM model."""
-
-    __dates__ = ["deleted_at"]
 
     @accessor
     def ticker_for_alpha_vantage(self):

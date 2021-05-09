@@ -43,7 +43,6 @@ CREATE TABLE public.stocks (
     exchange text NOT NULL,
     cik text NOT NULL,
     active boolean NOT NULL,
-    deleted_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
