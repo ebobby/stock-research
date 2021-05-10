@@ -67,17 +67,26 @@ ALTER SEQUENCE public.daily_prices_id_seq OWNED BY public.daily_prices.id;
 CREATE TABLE public.income_statements (
     id bigint NOT NULL,
     stock_id integer NOT NULL,
-    fiscal_date date NOT NULL,
+    report_date date NOT NULL,
     report_type character(2) NOT NULL,
-    currency text NOT NULL,
-    total_revenue bigint NOT NULL,
-    cost_of_revenue bigint NOT NULL,
-    gross_profit bigint NOT NULL,
-    operating_income bigint NOT NULL,
-    income_before_tax bigint NOT NULL,
-    income_tax bigint NOT NULL,
-    net_income_from_operations bigint NOT NULL,
-    net_income bigint NOT NULL,
+    currency text,
+    total_revenue numeric(20,5) NOT NULL,
+    cost_of_revenue numeric(20,5) NOT NULL,
+    gross_profit numeric(20,5) NOT NULL,
+    sga_expense numeric(20,5) NOT NULL,
+    research_and_development numeric(20,5) NOT NULL,
+    depreciation_and_amortization numeric(20,5) NOT NULL,
+    operating_expenses numeric(20,5) NOT NULL,
+    operating_income numeric(20,5) NOT NULL,
+    interest_expense numeric(20,5) NOT NULL,
+    interest_income numeric(20,5) NOT NULL,
+    total_other_income_expenses numeric(20,5) NOT NULL,
+    income_before_tax numeric(20,5) NOT NULL,
+    income_tax_expense numeric(20,5) NOT NULL,
+    net_income_after_tax numeric(20,5) NOT NULL,
+    discontinued_operations numeric(20,5) NOT NULL,
+    net_income numeric(20,5) NOT NULL,
+    source text NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
@@ -196,11 +205,11 @@ ALTER TABLE ONLY public.income_statements
 
 
 --
--- Name: income_statements income_statements_stock_id_fiscal_date_report_type_unique; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: income_statements income_statements_stock_id_report_date_report_type_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.income_statements
-    ADD CONSTRAINT income_statements_stock_id_fiscal_date_report_type_unique UNIQUE (stock_id, fiscal_date, report_type);
+    ADD CONSTRAINT income_statements_stock_id_report_date_report_type_unique UNIQUE (stock_id, report_date, report_type);
 
 
 --

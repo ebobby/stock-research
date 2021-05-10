@@ -5,10 +5,12 @@ import logging
 from datetime import date, datetime, timedelta
 from itertools import groupby
 
+from orator.exceptions.query import QueryException
+
 from . import nasdaq
 from .api import AlphaVantage, Polygon
 from .db import db
-from .db.model import DailyPrice, Stock
+from .db.model import DailyPrice, IncomeStatement, Stock
 from .logger import getLogger
 from .utils import parse
 
@@ -146,4 +148,137 @@ def prices():
 
     logger.info(
         f"Price sync finished, {processed} stocks processed, {skipped} skipped and {saved} daily prices saved"
+    )
+
+
+def income_statements():
+    """Import historical income statements from AlphaVantage into the database."""
+    logger = getLogger("income statement sync")
+
+    def process_reports(stock, report_type, reports, current):
+        saved = 0
+
+        for report in reports:
+            if report["fiscalDateEnding"] in current:
+                continue
+
+            # These two seem to be mixed up sometimes, pick the largest one.
+            cost_of_revenue = parse.int_or(report["costOfRevenue"], 0)
+            cost_of_goods = parse.int_or(report["costofGoodsAndServicesSold"], 0)
+            cost_of_revenue = max([cost_of_goods, cost_of_revenue])
+
+            gross_profit = parse.int_or(report["grossProfit"], 0)
+            total_revenue = parse.int_or(report["totalRevenue"], 0)
+
+            ins = IncomeStatement()
+            ins.report_type = report_type
+            ins.fiscal_date = parse.date_or(
+                report["fiscalDateEnding"], AlphaVantage.DATE_FORMAT
+            )
+            ins.currency = parse.str_or(report["reportedCurrency"], "")
+            ins.total_revenue = total_revenue
+            ins.cost_of_revenue = cost_of_revenue
+            ins.gross_profit = gross_profit
+            ins.operating_income = parse.int_or(report["operatingIncome"], 0)
+            ins.income_before_tax = parse.int_or(report["incomeBeforeTax"], 0)
+            ins.income_tax = parse.int_or(report["incomeTaxExpense"], 0)
+            ins.net_income_from_operations = parse.int_or(
+                report["netIncomeFromContinuingOperations"], 0
+            )
+            ins.net_income = parse.int_or(report["netIncome"], 0)
+
+            try:
+                stock.income_statements().save(ins)
+                saved += 1
+            except QueryException:
+                logger.error(
+                    f"Duplicate report {(report['fiscalDateEnding'], report_type)} found for {stock.ticker}"
+                )
+
+        return saved
+
+    logger.info("Income statement sync starting")
+
+    # AlphaVantage.co API
+    api = AlphaVantage()
+
+    stocks = list(Stock.where_active(True).order_by("ticker").get())
+    logger.info(f"{len(stocks)} active stocks found")
+
+    report_time = datetime.timestamp(datetime.now())
+    processed = 0
+    saved = 0
+    skipped = 0
+
+    today = date.today()
+
+    for stock in stocks:
+        skip_yearly = False
+        skip_quarterly = False
+
+        last_yearly = (
+            stock.income_statements()
+            .where_report_type("Y")
+            .order_by("fiscal_date", "desc")
+            .first()
+        )
+        last_quarterly = (
+            stock.income_statements()
+            .where_report_type("Y")
+            .order_by("fiscal_date", "desc")
+            .first()
+        )
+
+        skip_yearly = last_yearly and (today - last_yearly.fiscal_date).days < 365
+        skip_quarterly = (
+            last_quarterly and (today - last_quarterly.fiscal_date).days < 91
+        )
+
+        if skip_quarterly and skip_yearly:
+            skipped += 1
+            continue
+
+        # Fetch income statements
+        statements = api.income_statement(stock.ticker_for_alpha_vantage)
+
+        if not statements or "Error Message" in statements:
+            logger.warning(f"Failed to find income statements for {stock.ticker}")
+            continue
+
+        annual = statements["annualReports"]
+        quarterly = statements["quarterlyReports"]
+
+        if not skip_yearly:
+            # Build a set with statements we already have.
+            current_annual = {
+                fd.strftime(AlphaVantage.DATE_FORMAT)
+                for fd in stock.income_statements()
+                .where_report_type("Y")
+                .get()
+                .pluck("fiscal_date")
+            }
+            saved += process_reports(stock, "Y", annual, current_annual)
+
+        if not skip_quarterly:
+            # Build a set with statements we already have.
+            current_quarterly = {
+                fd.strftime(AlphaVantage.DATE_FORMAT)
+                for fd in stock.income_statements()
+                .where_report_type("Q")
+                .get()
+                .pluck("fiscal_date")
+            }
+            saved += process_reports(stock, "Q", quarterly, current_quarterly)
+
+        processed += 1
+
+        # Report current progress
+        if datetime.timestamp(datetime.now()) - report_time >= 60:
+            logger.info(
+                f"{processed} stocks processed, {skipped} skipped. {saved} income statements saved"
+            )
+            report_time = datetime.timestamp(datetime.now())
+
+    logger.info(
+        f"Income statement sync finished, {processed} stocks processed, {skipped} skipped. {saved} income statements saved"
     )
