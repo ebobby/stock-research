@@ -16,6 +16,12 @@ class Stock(Model):
 
         return DailyPrice
 
+    @has_many
+    def income_statements(self):
+        from .income_statement import IncomeStatement
+
+        return IncomeStatement
+
     @accessor
     def ticker_for_alpha_vantage(self):
         """Convert ticker to a format that's supported by Alpha Vantage."""

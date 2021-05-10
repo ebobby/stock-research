@@ -61,6 +61,48 @@ ALTER SEQUENCE public.daily_prices_id_seq OWNED BY public.daily_prices.id;
 
 
 --
+-- Name: income_statements; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.income_statements (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    fiscal_date date NOT NULL,
+    report_type character(2) NOT NULL,
+    currency text NOT NULL,
+    total_revenue bigint NOT NULL,
+    cost_of_revenue bigint NOT NULL,
+    gross_profit bigint NOT NULL,
+    operating_income bigint NOT NULL,
+    income_before_tax bigint NOT NULL,
+    income_tax bigint NOT NULL,
+    net_income_from_operations bigint NOT NULL,
+    net_income bigint NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: income_statements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.income_statements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: income_statements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.income_statements_id_seq OWNED BY public.income_statements.id;
+
+
+--
 -- Name: migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -116,6 +158,13 @@ ALTER TABLE ONLY public.daily_prices ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: income_statements id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.income_statements ALTER COLUMN id SET DEFAULT nextval('public.income_statements_id_seq'::regclass);
+
+
+--
 -- Name: stocks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -136,6 +185,22 @@ ALTER TABLE ONLY public.daily_prices
 
 ALTER TABLE ONLY public.daily_prices
     ADD CONSTRAINT daily_prices_stock_id_date_unique UNIQUE (stock_id, date);
+
+
+--
+-- Name: income_statements income_statements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.income_statements
+    ADD CONSTRAINT income_statements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: income_statements income_statements_stock_id_fiscal_date_report_type_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.income_statements
+    ADD CONSTRAINT income_statements_stock_id_fiscal_date_report_type_unique UNIQUE (stock_id, fiscal_date, report_type);
 
 
 --
@@ -170,6 +235,14 @@ ALTER TABLE ONLY public.daily_prices
 
 
 --
+-- Name: income_statements income_statements_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.income_statements
+    ADD CONSTRAINT income_statements_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -196,7 +269,8 @@ SET row_security = off;
 --
 
 INSERT INTO public.migrations VALUES ('2021_05_01_024853_create_stocks_table', 1);
-INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 2);
+INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 1);
+INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 2);
 
 
 --
