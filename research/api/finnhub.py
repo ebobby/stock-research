@@ -34,7 +34,6 @@ class Finnhub:
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "User-Agent": "finnhub/python",
         }
 
         try:
