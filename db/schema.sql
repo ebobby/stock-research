@@ -21,6 +21,79 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: balance_sheets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.balance_sheets (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    report_date date NOT NULL,
+    report_type character(2) NOT NULL,
+    currency text,
+    total_assets numeric(20,5) NOT NULL,
+    total_current_assets numeric(20,5) NOT NULL,
+    cash_and_short_term_investments numeric(20,5) NOT NULL,
+    receivables numeric(20,5) NOT NULL,
+    inventory numeric(20,5) NOT NULL,
+    other_current_assets numeric(20,5) NOT NULL,
+    total_non_current_assets numeric(20,5) NOT NULL,
+    property_plant_equipment numeric(20,5) NOT NULL,
+    good_will numeric(20,5) NOT NULL,
+    intangible_assets numeric(20,5) NOT NULL,
+    long_term_investments numeric(20,5) NOT NULL,
+    other_non_current_assets numeric(20,5) NOT NULL,
+    total_liabilities numeric(20,5) NOT NULL,
+    total_current_liabilities numeric(20,5) NOT NULL,
+    accounts_payable numeric(20,5) NOT NULL,
+    short_term_debt numeric(20,5) NOT NULL,
+    other_current_liabilities numeric(20,5) NOT NULL,
+    total_non_current_liabilities numeric(20,5) NOT NULL,
+    long_term_debt numeric(20,5) NOT NULL,
+    deferred_long_term_liabilities numeric(20,5) NOT NULL,
+    negative_good_will numeric(20,5) NOT NULL,
+    other_non_current_liabilities numeric(20,5) NOT NULL,
+    total_stockholder_equity numeric(20,5) NOT NULL,
+    preferred_stock_equity numeric(20,5) NOT NULL,
+    common_stock_equity numeric(20,5) NOT NULL,
+    paid_in_capital numeric(20,5) NOT NULL,
+    retained_earnings numeric(20,5) NOT NULL,
+    treasury_stock numeric(20,5) NOT NULL,
+    gain_losses numeric(20,5) NOT NULL,
+    non_controlling_interest numeric(20,5) NOT NULL,
+    total_capitalization numeric(20,5) NOT NULL,
+    capital_lease_obligations numeric(20,5) NOT NULL,
+    net_tangible_assets numeric(20,5) NOT NULL,
+    net_working_capital numeric(20,5) NOT NULL,
+    net_invested_capital numeric(20,5) NOT NULL,
+    short_long_term_debt_total numeric(20,5) NOT NULL,
+    net_debt numeric(20,5) NOT NULL,
+    common_stock_shares_outstanding numeric(20,5) NOT NULL,
+    source text NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: balance_sheets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.balance_sheets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: balance_sheets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.balance_sheets_id_seq OWNED BY public.balance_sheets.id;
+
+
+--
 -- Name: daily_prices; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -160,6 +233,13 @@ ALTER SEQUENCE public.stocks_id_seq OWNED BY public.stocks.id;
 
 
 --
+-- Name: balance_sheets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.balance_sheets ALTER COLUMN id SET DEFAULT nextval('public.balance_sheets_id_seq'::regclass);
+
+
+--
 -- Name: daily_prices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -178,6 +258,22 @@ ALTER TABLE ONLY public.income_statements ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.stocks ALTER COLUMN id SET DEFAULT nextval('public.stocks_id_seq'::regclass);
+
+
+--
+-- Name: balance_sheets balance_sheets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.balance_sheets
+    ADD CONSTRAINT balance_sheets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: balance_sheets balance_sheets_stock_id_report_date_report_type_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.balance_sheets
+    ADD CONSTRAINT balance_sheets_stock_id_report_date_report_type_unique UNIQUE (stock_id, report_date, report_type);
 
 
 --
@@ -236,6 +332,14 @@ CREATE INDEX daily_prices_date_index ON public.daily_prices USING btree (date);
 
 
 --
+-- Name: balance_sheets balance_sheets_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.balance_sheets
+    ADD CONSTRAINT balance_sheets_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- Name: daily_prices daily_prices_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -280,6 +384,7 @@ SET row_security = off;
 INSERT INTO public.migrations VALUES ('2021_05_01_024853_create_stocks_table', 1);
 INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 1);
 INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 2);
+INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 2);
 
 
 --

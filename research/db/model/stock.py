@@ -22,6 +22,12 @@ class Stock(Model):
 
         return IncomeStatement
 
+    @has_many
+    def balance_sheets(self):
+        from .balance_sheet import BalanceSheet
+
+        return BalanceSheet
+
     @accessor
     def ticker_for_alpha_vantage(self):
         """Convert ticker to a format that's supported by Alpha Vantage."""
