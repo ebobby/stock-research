@@ -15,7 +15,7 @@ class EOD:
     """Lightweight wrapper for EOD Historical Data API."""
 
     API_KEY_ENV = "EOD_API_KEY"
-    BASE_URL = Template("https://eodhistoricaldata.com/api/$namespace/$function/")
+    BASE_URL = Template("https://eodhistoricaldata.com/api/$namespace/$function")
 
     def __init__(self, api_key=None):
         self._api_key = api_key or os.environ.get(self.API_KEY_ENV, "")
@@ -42,6 +42,15 @@ class EOD:
             if response.status_code != 200:
                 return {"error": f"status_code={response.status_code}"}
             return response.json()
+
+    def exchanges_list(self):
+        """Get the full list of supported exchanges with names, codes, operating MICs,
+        country, and currency."""
+        return self._call_api("exchanges-list", "", fmt="json")
+
+    def exchange_symbol_list(self, exchange="US"):
+        """Get a list of symbols for the given exchange."""
+        return self._call_api("exchange-symbol-list", exchange.upper(), fmt="json")
 
     def eod(
         self,
