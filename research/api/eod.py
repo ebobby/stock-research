@@ -21,7 +21,7 @@ class EOD:
         self._api_key = api_key or os.environ.get(self.API_KEY_ENV, "")
 
     @sleep_and_retry
-    @limits(calls=60, period=60)
+    @limits(calls=2000, period=60)
     def _call_api(self, namespace, function, **kwargs):
         """Make an API call, handles keyword arguments and api keys."""
         url = self.BASE_URL.substitute(namespace=namespace, function=function)
