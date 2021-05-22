@@ -29,8 +29,8 @@ class Stock(Model):
         return BalanceSheet
 
     @accessor
-    def ticker_for_alpha_vantage(self):
-        """Convert ticker to a format that's supported by Alpha Vantage."""
+    def ticker_for_api(self):
+        """Convert ticker to a format that's supported by most API's."""
         ticker = self.ticker
 
         # Alpha Vantage nor Yahoo Finance like dots.
