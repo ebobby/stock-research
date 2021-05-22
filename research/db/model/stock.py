@@ -28,6 +28,12 @@ class Stock(Model):
 
         return BalanceSheet
 
+    @has_many
+    def cash_flow_statements(self):
+        from .cash_flow_statement import CashFlowStatement
+
+        return CashFlowStatement
+
     @accessor
     def ticker_for_api(self):
         """Convert ticker to a format that's supported by most API's."""

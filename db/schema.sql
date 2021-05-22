@@ -94,6 +94,58 @@ ALTER SEQUENCE public.balance_sheets_id_seq OWNED BY public.balance_sheets.id;
 
 
 --
+-- Name: cash_flow_statements; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.cash_flow_statements (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    report_date date NOT NULL,
+    report_type character(2) NOT NULL,
+    currency text,
+    net_income numeric(20,5) NOT NULL,
+    depreciation numeric(20,5) NOT NULL,
+    other_cash_from_operating_activites numeric(20,5) NOT NULL,
+    total_cash_from_operating_activities numeric(20,5) NOT NULL,
+    capital_expenditures numeric(20,5) NOT NULL,
+    investments numeric(20,5) NOT NULL,
+    other_cash_from_investing_activities numeric(20,5) NOT NULL,
+    total_cash_from_investing_activities numeric(20,5) NOT NULL,
+    net_borrowing numeric(20,5) NOT NULL,
+    dividends_paid numeric(20,5) NOT NULL,
+    sale_or_purchase_of_stock numeric(20,5) NOT NULL,
+    other_cash_from_financing_activities numeric(20,5) NOT NULL,
+    total_cash_from_financing_activities numeric(20,5) NOT NULL,
+    initial_cash numeric(20,5) NOT NULL,
+    change_in_cash numeric(20,5) NOT NULL,
+    final_cash numeric(20,5) NOT NULL,
+    free_cash_flow numeric(20,5) NOT NULL,
+    source text NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: cash_flow_statements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.cash_flow_statements_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: cash_flow_statements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.cash_flow_statements_id_seq OWNED BY public.cash_flow_statements.id;
+
+
+--
 -- Name: daily_prices; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -240,6 +292,13 @@ ALTER TABLE ONLY public.balance_sheets ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: cash_flow_statements id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cash_flow_statements ALTER COLUMN id SET DEFAULT nextval('public.cash_flow_statements_id_seq'::regclass);
+
+
+--
 -- Name: daily_prices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -274,6 +333,22 @@ ALTER TABLE ONLY public.balance_sheets
 
 ALTER TABLE ONLY public.balance_sheets
     ADD CONSTRAINT balance_sheets_stock_id_report_date_report_type_unique UNIQUE (stock_id, report_date, report_type);
+
+
+--
+-- Name: cash_flow_statements cash_flow_statements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cash_flow_statements
+    ADD CONSTRAINT cash_flow_statements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cash_flow_statements cash_flow_statements_stock_id_report_date_report_type_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cash_flow_statements
+    ADD CONSTRAINT cash_flow_statements_stock_id_report_date_report_type_unique UNIQUE (stock_id, report_date, report_type);
 
 
 --
@@ -340,6 +415,14 @@ ALTER TABLE ONLY public.balance_sheets
 
 
 --
+-- Name: cash_flow_statements cash_flow_statements_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cash_flow_statements
+    ADD CONSTRAINT cash_flow_statements_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- Name: daily_prices daily_prices_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -385,6 +468,7 @@ INSERT INTO public.migrations VALUES ('2021_05_01_024853_create_stocks_table', 1
 INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 1);
 INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 2);
 INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 2);
+INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statements_table', 2);
 
 
 --
