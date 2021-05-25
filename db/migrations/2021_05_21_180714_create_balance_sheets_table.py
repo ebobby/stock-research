@@ -10,18 +10,17 @@ class CreateBalanceSheetsTable(Migration):
             table.big_increments("id")
 
             table.integer("stock_id").unsigned()
-
-            # Data
             table.date("report_date")
             table.char("report_type", 2)
             table.text("currency").nullable()
 
-            table.decimal("total_assets", 20, 5)
+            table.date("filing_date")
 
+            table.decimal("total_assets", 20, 5)
             table.decimal("total_current_assets", 20, 5)
-            table.decimal("cash_and_short_term_investments", 20, 5)
-            table.decimal("receivables", 20, 5)
+            table.decimal("cash_and_short_term", 20, 5)
             table.decimal("inventory", 20, 5)
+            table.decimal("receivables", 20, 5)
             table.decimal("other_current_assets", 20, 5)
 
             table.decimal("total_non_current_assets", 20, 5)
@@ -41,7 +40,6 @@ class CreateBalanceSheetsTable(Migration):
             table.decimal("total_non_current_liabilities", 20, 5)
             table.decimal("long_term_debt", 20, 5)
             table.decimal("deferred_long_term_liabilities", 20, 5)
-            table.decimal("negative_good_will", 20, 5)
             table.decimal("other_non_current_liabilities", 20, 5)
 
             table.decimal("total_stockholder_equity", 20, 5)

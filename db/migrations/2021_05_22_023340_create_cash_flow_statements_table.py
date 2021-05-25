@@ -10,11 +10,11 @@ class CreateCashFlowStatementsTable(Migration):
             table.big_increments("id")
 
             table.integer("stock_id").unsigned()
-
-            # Data
             table.date("report_date")
             table.char("report_type", 2)
             table.text("currency").nullable()
+
+            table.date("filing_date")
 
             table.decimal("net_income", 20, 5)
             table.decimal("depreciation", 20, 5)
