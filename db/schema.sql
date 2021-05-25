@@ -168,6 +168,7 @@ CREATE TABLE public.company_profiles (
     isin text,
     cusip text,
     cik text,
+    is_delisted boolean NOT NULL,
     fulltime_employees bigint NOT NULL,
     market_capitalization numeric(20,5) NOT NULL,
     ipo_date date,
@@ -305,12 +306,11 @@ CREATE TABLE public.migrations (
 
 CREATE TABLE public.stocks (
     id integer NOT NULL,
-    ticker text NOT NULL,
+    symbol text NOT NULL,
     name text NOT NULL,
-    locale text NOT NULL,
+    country text NOT NULL,
     currency text NOT NULL,
     exchange text NOT NULL,
-    cik text NOT NULL,
     active boolean NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
@@ -468,11 +468,11 @@ ALTER TABLE ONLY public.stocks
 
 
 --
--- Name: stocks stocks_ticker_unique; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: stocks stocks_symbol_unique; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.stocks
-    ADD CONSTRAINT stocks_ticker_unique UNIQUE (ticker);
+    ADD CONSTRAINT stocks_symbol_unique UNIQUE (symbol);
 
 
 --
@@ -559,4 +559,3 @@ INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table'
 --
 -- PostgreSQL database dump complete
 --
-

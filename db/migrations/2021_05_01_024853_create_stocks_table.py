@@ -10,19 +10,18 @@ class CreateStocksTable(Migration):
             table.increments("id")
 
             # Data
-            table.text("ticker")
+            table.text("symbol")
             table.text("name")
-            table.text("locale")
+            table.text("country")
             table.text("currency")
             table.text("exchange")
-            table.text("cik")
             table.boolean("active")
 
             # Timestamps
             table.timestamps()
 
             # Indexes
-            table.unique("ticker")
+            table.unique("symbol")
 
     def down(self):
         """

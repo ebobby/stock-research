@@ -41,16 +41,16 @@ class Stock(Model):
         return CashFlowStatement
 
     @accessor
-    def ticker_for_api(self):
-        """Convert ticker to a format that's supported by most API's."""
-        ticker = self.ticker
+    def symbol_for_api(self):
+        """Convert symbol to a format that's supported by most API's."""
+        symbol = self.symbol
 
         # Alpha Vantage nor Yahoo Finance like dots.
-        ticker = ticker.replace(".", "-")
+        symbol = symbol.replace(".", "-")
 
         # ... nor $, $ becomes -P and every letter after that a -letter.
-        if "$" in ticker:
-            parts = ticker.split("$")
-            ticker = parts[0] + "-P" + "".join([f"-{c}" for c in parts[1]])
+        if "$" in symbol:
+            parts = symbol.split("$")
+            symbol = parts[0] + "-P" + "".join([f"-{c}" for c in parts[1]])
 
-        return ticker
+        return symbol

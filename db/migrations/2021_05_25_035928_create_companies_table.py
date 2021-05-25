@@ -29,6 +29,8 @@ class CreateCompaniesTable(Migration):
             table.text("cusip").nullable()
             table.text("cik").nullable()
 
+            table.boolean("is_delisted")
+
             table.big_integer("fulltime_employees")
             table.decimal("market_capitalization", 20, 5)
 
