@@ -147,6 +147,57 @@ ALTER SEQUENCE public.cash_flow_statements_id_seq OWNED BY public.cash_flow_stat
 
 
 --
+-- Name: company_profiles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.company_profiles (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    name text NOT NULL,
+    description text NOT NULL,
+    address text NOT NULL,
+    phone text NOT NULL,
+    url text NOT NULL,
+    logo_url text NOT NULL,
+    exchange text NOT NULL,
+    currency text NOT NULL,
+    country text NOT NULL,
+    location text NOT NULL,
+    sector text NOT NULL,
+    industry text NOT NULL,
+    isin text,
+    cusip text,
+    cik text,
+    fulltime_employees bigint NOT NULL,
+    market_capitalization numeric(20,5) NOT NULL,
+    ipo_date date,
+    last_update_date date,
+    source text NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: company_profiles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.company_profiles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: company_profiles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.company_profiles_id_seq OWNED BY public.company_profiles.id;
+
+
+--
 -- Name: daily_prices; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -301,6 +352,13 @@ ALTER TABLE ONLY public.cash_flow_statements ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: company_profiles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.company_profiles ALTER COLUMN id SET DEFAULT nextval('public.company_profiles_id_seq'::regclass);
+
+
+--
 -- Name: daily_prices id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -351,6 +409,22 @@ ALTER TABLE ONLY public.cash_flow_statements
 
 ALTER TABLE ONLY public.cash_flow_statements
     ADD CONSTRAINT cash_flow_statements_stock_id_report_date_report_type_unique UNIQUE (stock_id, report_date, report_type);
+
+
+--
+-- Name: company_profiles company_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.company_profiles
+    ADD CONSTRAINT company_profiles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: company_profiles company_profiles_stock_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.company_profiles
+    ADD CONSTRAINT company_profiles_stock_id_unique UNIQUE (stock_id);
 
 
 --
@@ -425,6 +499,14 @@ ALTER TABLE ONLY public.cash_flow_statements
 
 
 --
+-- Name: company_profiles company_profiles_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.company_profiles
+    ADD CONSTRAINT company_profiles_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- Name: daily_prices daily_prices_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -471,6 +553,7 @@ INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_tab
 INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 2);
 INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 2);
 INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statements_table', 2);
+INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table', 3);
 
 
 --

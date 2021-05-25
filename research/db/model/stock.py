@@ -2,7 +2,7 @@
 """Stock/Shares ORM model."""
 
 from orator import Model
-from orator.orm import accessor, has_many
+from orator.orm import accessor, has_many, has_one
 
 __author__ = "Francisco Soto"
 
@@ -15,6 +15,12 @@ class Stock(Model):
         from .daily_price import DailyPrice
 
         return DailyPrice
+
+    @has_one
+    def company_profile(self):
+        from .company_profile import CompanyProfile
+
+        return CompanyProfile
 
     @has_many
     def income_statements(self):
