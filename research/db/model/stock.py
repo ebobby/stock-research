@@ -16,6 +16,12 @@ class Stock(Model):
 
         return DailyPrice
 
+    @has_many
+    def errors(self):
+        from .error import Error
+
+        return Error
+
     @has_one
     def company_profile(self):
         from .company_profile import CompanyProfile

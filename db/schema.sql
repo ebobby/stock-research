@@ -239,6 +239,39 @@ ALTER SEQUENCE public.daily_prices_id_seq OWNED BY public.daily_prices.id;
 
 
 --
+-- Name: errors; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.errors (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    message text NOT NULL,
+    source text NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: errors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.errors_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: errors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.errors_id_seq OWNED BY public.errors.id;
+
+
+--
 -- Name: income_statements; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -366,6 +399,13 @@ ALTER TABLE ONLY public.daily_prices ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: errors id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.errors ALTER COLUMN id SET DEFAULT nextval('public.errors_id_seq'::regclass);
+
+
+--
 -- Name: income_statements id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -444,6 +484,14 @@ ALTER TABLE ONLY public.daily_prices
 
 
 --
+-- Name: errors errors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.errors
+    ADD CONSTRAINT errors_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: income_statements income_statements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -483,6 +531,13 @@ CREATE INDEX daily_prices_date_index ON public.daily_prices USING btree (date);
 
 
 --
+-- Name: errors_stock_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX errors_stock_id_index ON public.errors USING btree (stock_id);
+
+
+--
 -- Name: balance_sheets balance_sheets_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -512,6 +567,14 @@ ALTER TABLE ONLY public.company_profiles
 
 ALTER TABLE ONLY public.daily_prices
     ADD CONSTRAINT daily_prices_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
+-- Name: errors errors_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.errors
+    ADD CONSTRAINT errors_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
 
 
 --
@@ -554,8 +617,10 @@ INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statement
 INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 2);
 INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statements_table', 2);
 INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table', 3);
+INSERT INTO public.migrations VALUES ('2021_05_27_210259_create_table_data_errors', 4);
 
 
 --
 -- PostgreSQL database dump complete
 --
+
