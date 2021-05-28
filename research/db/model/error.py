@@ -10,6 +10,8 @@ __author__ = "Francisco Soto"
 class Error(Model):
     """Error (in data) ORM model."""
 
+    __fillable__ = ["message", "source"]
+
     @belongs_to
     def stock(self):
         from . import Stock

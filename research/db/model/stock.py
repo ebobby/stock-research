@@ -60,3 +60,7 @@ class Stock(Model):
             symbol = parts[0] + "-P" + "".join([f"-{c}" for c in parts[1]])
 
         return symbol
+
+    def add_error(self, message, source):
+        """Add an error to this stock."""
+        self.errors().create({"message": message, "source": source})
