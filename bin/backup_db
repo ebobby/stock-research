@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#; -*- mode: sh;-*-
+
+pg_dump --user stocks -Fc -O -x --no-comments stock-research > db/backups/`date +"%Y-%m-%d-%H%M%S"`-backup.tar
