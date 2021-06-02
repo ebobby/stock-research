@@ -67,3 +67,9 @@ class EOD:
     def fundamentals(self, symbol, exchange="US"):
         """Fundamentals data feed."""
         return self._call_api("fundamentals", f"{symbol.upper()}.{exchange.upper()}")
+
+    def bulk_fundamentals(self, exchange, symbols=None):
+        """Bulk fundamentals data feed."""
+        return self._call_api(
+            "bulk-fundamentals", exchange.upper(), symbols=symbols, fmt="json"
+        )
