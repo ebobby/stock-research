@@ -1,4 +1,5 @@
 orator
+parsel
 psycopg2
 ratelimit
 requests
