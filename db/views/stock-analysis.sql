@@ -144,6 +144,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       INNER JOIN cash_flow_statements ON stocks.id = cash_flow_statements.stock_id
              AND income_statements.report_date = cash_flow_statements.report_date
              AND income_statements.report_type = cash_flow_statements.report_type
+    WHERE stocks.id NOT IN (SELECT DISTINCT stock_id FROM errors)
     ORDER BY stocks.symbol, income_statements.report_type, income_statements.report_date desc
 );
 
