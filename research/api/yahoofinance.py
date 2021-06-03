@@ -30,7 +30,7 @@ class YahooFinance:
                 return ""
             return response.content.decode("utf-8")
 
-    def estimated_yearly_growth(self, symbol=None):
+    def estimated_growth(self, symbol=None):
         """Estimated yearly growth for the given symbol."""
 
         def parse_value(value):
@@ -48,6 +48,10 @@ class YahooFinance:
         )
 
         return {
+            "current_quarter": parse_value(
+                page.css('td[data-reactid="399"]::text').get()
+            ),
+            "next_quarter": parse_value(page.css('td[data-reactid="406"]::text').get()),
             "current_year": parse_value(page.css('td[data-reactid="413"]::text').get()),
             "next_year": parse_value(page.css('td[data-reactid="420"]::text').get()),
             "next_five_years": parse_value(
