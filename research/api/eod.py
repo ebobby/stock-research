@@ -62,7 +62,14 @@ class EOD:
         todate="",
     ):
         """End-of-day data feed."""
-        return self._call_api("eod", f"{symbol.upper()}.{exchange.upper()}", fmt="json")
+        return self._call_api(
+            "eod",
+            f"{symbol.upper()}.{exchange.upper()}",
+            period=period,
+            order=order,
+            **{"from": fromdate, "to": todate},
+            fmt="json",
+        )
 
     def fundamentals(self, symbol, exchange="US"):
         """Fundamentals data feed."""
