@@ -25,11 +25,6 @@ class CreateCompaniesTable(Migration):
             table.text("sector")
             table.text("industry")
 
-            table.text("gic_sector")
-            table.text("gic_group")
-            table.text("gic_industry")
-            table.text("gic_sub_industry")
-
             table.text("isin").nullable()
             table.text("cusip").nullable()
             table.text("cik").nullable()
