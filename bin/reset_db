@@ -3,4 +3,4 @@
 
 dropdb --user stocks stock-research
 createdb --user stocks stock-research
-psql --u stocks --password stock-research < databases/schema.sql
+psql --u stocks --password stock-research < db/schema.sql
