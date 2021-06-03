@@ -106,20 +106,20 @@
         "WebURL": "http://www.apple.com",
         "LogoURL": "/img/logos/US/aapl.png",
         "FullTimeEmployees": 100000,
-        "UpdatedAt": "2021-05-27"
+        "UpdatedAt": "2021-06-03"
     },
     "Highlights": {
-        "MarketCapitalization": 2116821975040,
-        "MarketCapitalizationMln": 2116821.975,
+        "MarketCapitalization": 2068094255104,
+        "MarketCapitalizationMln": 2068094.2551,
         "EBITDA": 99820003328,
-        "PERatio": 28.512,
-        "PEGRatio": 2.0436,
-        "WallStreetTargetPrice": 159.59,
+        "PERatio": 27.8557,
+        "PEGRatio": 2.0302,
+        "WallStreetTargetPrice": 159.85,
         "BookValue": 4.146,
         "DividendShare": 0.82,
-        "DividendYield": 0.0065,
+        "DividendYield": 0.0066,
         "EarningsShare": 4.449,
-        "EPSEstimateCurrentYear": 5.2,
+        "EPSEstimateCurrentYear": 5.19,
         "EPSEstimateNextYear": 5.35,
         "EPSEstimateNextQuarter": 0,
         "EPSEstimateCurrentQuarter": 0.99,
@@ -136,20 +136,21 @@
         "QuarterlyEarningsGrowthYOY": 1.188
     },
     "Valuation": {
-        "TrailingPE": 28.512,
-        "ForwardPE": 24.8139,
-        "PriceSalesTTM": 6.622,
-        "PriceBookMRQ": 30.2572,
-        "EnterpriseValueRevenue": 6.5916,
-        "EnterpriseValueEbitda": 20.7875
+        "TrailingPE": 27.8557,
+        "ForwardPE": 24.6305,
+        "PriceSalesTTM": 6.5787,
+        "PriceBookMRQ": 30.0594,
+        "EnterpriseValue": 2151866171392,
+        "EnterpriseValueRevenue": 6.5495,
+        "EnterpriseValueEbitda": 20.6549
     },
     "SharesStats": {
         "SharesOutstanding": 16687599616,
         "SharesFloat": 16670609616,
         "PercentInsiders": 0.066,
-        "PercentInstitutions": 58.714,
-        "SharesShort": 82710348,
-        "SharesShortPriorMonth": 127637729,
+        "PercentInstitutions": 58.714999999999996,
+        "SharesShort": 94747255,
+        "SharesShortPriorMonth": 82710348,
         "ShortRatio": 1.01,
         "ShortPercentOutstanding": 0.01,
         "ShortPercentFloat": 0.0057
@@ -157,17 +158,17 @@
     "Technicals": {
         "Beta": 1.2037,
         "52WeekHigh": 144.6279,
-        "52WeekLow": 78.588,
-        "50DayMA": 130.0543,
-        "200DayMA": 127.3668,
-        "SharesShort": 82710348,
-        "SharesShortPriorMonth": 127637729,
+        "52WeekLow": 80.2666,
+        "50DayMA": 129.1729,
+        "200DayMA": 127.6302,
+        "SharesShort": 94747255,
+        "SharesShortPriorMonth": 82710348,
         "ShortRatio": 1.01,
         "ShortPercent": 0.0057
     },
     "SplitsDividends": {
         "ForwardAnnualDividendRate": 0.88,
-        "ForwardAnnualDividendYield": 0.0069,
+        "ForwardAnnualDividendYield": 0.007,
         "PayoutRatio": 0.1872,
         "DividendDate": "2021-05-13",
         "ExDividendDate": "2021-05-07",
@@ -947,1032 +948,492 @@
     "outstandingShares": {
         "annual": {
             "0": {
-                "date": "2021",
-                "dateFormatted": "2021-12-31",
-                "sharesMln": "16929.1570",
-                "shares": 16929157000
-            },
-            "1": {
                 "date": "2020",
                 "dateFormatted": "2020-12-31",
-                "sharesMln": "17113.6880",
-                "shares": 17113687999.999998
+                "sharesMln": "17528.0000",
+                "shares": 17528000000
             },
-            "2": {
+            "1": {
                 "date": "2019",
                 "dateFormatted": "2019-12-31",
-                "sharesMln": "17818.4160",
-                "shares": 17818416000
+                "sharesMln": "18596.0000",
+                "shares": 18596000000
             },
-            "3": {
+            "2": {
                 "date": "2018",
                 "dateFormatted": "2018-12-31",
-                "sharesMln": "19093.0080",
-                "shares": 19093008000
+                "sharesMln": "20000.0000",
+                "shares": 20000000000
             },
-            "4": {
+            "3": {
                 "date": "2017",
                 "dateFormatted": "2017-12-31",
-                "sharesMln": "20631.1480",
-                "shares": 20631148000
+                "sharesMln": "21007.0000",
+                "shares": 21007000000
             },
-            "5": {
+            "4": {
                 "date": "2016",
                 "dateFormatted": "2016-12-31",
-                "sharesMln": "21311.9800",
-                "shares": 21311980000
+                "sharesMln": "22001.0000",
+                "shares": 22001000000
             },
-            "6": {
+            "5": {
                 "date": "2015",
                 "dateFormatted": "2015-12-31",
-                "sharesMln": "22376.5080",
-                "shares": 22376508000
+                "sharesMln": "23172.0000",
+                "shares": 23172000000
             },
-            "7": {
+            "6": {
                 "date": "2014",
                 "dateFormatted": "2014-12-31",
-                "sharesMln": "23527.2120",
-                "shares": 23527212000
+                "sharesMln": "24491.0000",
+                "shares": 24491000000
             },
-            "8": {
+            "7": {
                 "date": "2013",
                 "dateFormatted": "2013-12-31",
-                "sharesMln": "25240.6560",
-                "shares": 25240656000
+                "sharesMln": "26087.0000",
+                "shares": 26087000000
             },
-            "9": {
+            "8": {
                 "date": "2012",
                 "dateFormatted": "2012-12-31",
-                "sharesMln": "26522.0760",
-                "shares": 26522076000
+                "sharesMln": "26470.0000",
+                "shares": 26470000000
             },
-            "10": {
+            "9": {
                 "date": "2011",
                 "dateFormatted": "2011-12-31",
-                "sharesMln": "26364.0160",
-                "shares": 26364016000
+                "sharesMln": "26226.0000",
+                "shares": 26226000000
             },
-            "11": {
+            "10": {
                 "date": "2010",
                 "dateFormatted": "2010-12-31",
-                "sharesMln": "26128.3120",
-                "shares": 26128312000
+                "sharesMln": "25892.0000",
+                "shares": 25892000000
             },
-            "12": {
+            "11": {
                 "date": "2009",
                 "dateFormatted": "2009-12-31",
-                "sharesMln": "25753.9240",
-                "shares": 25753924000
+                "sharesMln": "25396.0000",
+                "shares": 25396000000
             },
-            "13": {
+            "12": {
                 "date": "2008",
                 "dateFormatted": "2008-12-31",
-                "sharesMln": "25241.8320",
-                "shares": 25241832000
+                "sharesMln": "25260.0000",
+                "shares": 25260000000
             },
-            "14": {
+            "13": {
                 "date": "2007",
                 "dateFormatted": "2007-12-31",
-                "sharesMln": "25201.5120",
-                "shares": 25201512000
+                "sharesMln": "24900.0000",
+                "shares": 24900000000
             },
-            "15": {
+            "14": {
                 "date": "2006",
                 "dateFormatted": "2006-12-31",
-                "sharesMln": "24732.3160",
-                "shares": 24732316000
+                "sharesMln": "24571.0000",
+                "shares": 24571000000
             },
-            "16": {
+            "15": {
                 "date": "2005",
                 "dateFormatted": "2005-12-31",
-                "sharesMln": "24477.7960",
-                "shares": 24477796000
-            },
-            "17": {
-                "date": "2004",
-                "dateFormatted": "2004-12-31",
-                "sharesMln": "23468.8720",
-                "shares": 23468872000
-            },
-            "18": {
-                "date": "2003",
-                "dateFormatted": "2003-12-31",
-                "sharesMln": "20849.2480",
-                "shares": 20849248000
-            },
-            "19": {
-                "date": "2002",
-                "dateFormatted": "2002-12-31",
-                "sharesMln": "20107.1920",
-                "shares": 20107192000
-            },
-            "20": {
-                "date": "2001",
-                "dateFormatted": "2001-12-31",
-                "sharesMln": "20020.5040",
-                "shares": 20020504000
-            },
-            "21": {
-                "date": "2000",
-                "dateFormatted": "2000-12-31",
-                "sharesMln": "18881.5200",
-                "shares": 18881520000
-            },
-            "22": {
-                "date": "1999",
-                "dateFormatted": "1999-12-31",
-                "sharesMln": "19982.7040",
-                "shares": 19982704000
-            },
-            "23": {
-                "date": "1998",
-                "dateFormatted": "1998-12-31",
-                "sharesMln": "19270.9440",
-                "shares": 19270944000
-            },
-            "24": {
-                "date": "1997",
-                "dateFormatted": "1997-12-31",
-                "sharesMln": "15661.9680",
-                "shares": 15661968000
-            },
-            "25": {
-                "date": "1996",
-                "dateFormatted": "1996-12-31",
-                "sharesMln": "13947.5840",
-                "shares": 13947584000
-            },
-            "26": {
-                "date": "1995",
-                "dateFormatted": "1995-12-31",
-                "sharesMln": "13775.3280",
-                "shares": 13775328000
-            },
-            "27": {
-                "date": "1994",
-                "dateFormatted": "1994-12-31",
-                "sharesMln": "13625.4720",
-                "shares": 13625472000
-            },
-            "28": {
-                "date": "1993",
-                "dateFormatted": "1993-12-31",
-                "sharesMln": "13099.0720",
-                "shares": 13099072000
-            },
-            "29": {
-                "date": "1992",
-                "dateFormatted": "1992-12-31",
-                "sharesMln": "13481.7910",
-                "shares": 13481791000
-            },
-            "30": {
-                "date": "1991",
-                "dateFormatted": "1991-12-31",
-                "sharesMln": "13670.5882",
-                "shares": 13670588200
-            },
-            "31": {
-                "date": "1990",
-                "dateFormatted": "1990-12-31",
-                "sharesMln": "13168.7500",
-                "shares": 13168750000
-            },
-            "32": {
-                "date": "1989",
-                "dateFormatted": "1989-12-31",
-                "sharesMln": "14560.0000",
-                "shares": 14560000000
-            },
-            "33": {
-                "date": "1988",
-                "dateFormatted": "1988-12-31",
-                "sharesMln": "14285.2640",
-                "shares": 14285264000
-            },
-            "34": {
-                "date": "1987",
-                "dateFormatted": "1987-12-31",
-                "sharesMln": "14063.2800",
-                "shares": 14063280000
-            },
-            "35": {
-                "date": "1986",
-                "dateFormatted": "1986-12-31",
-                "sharesMln": "14260.0640",
-                "shares": 14260064000
-            },
-            "36": {
-                "date": "1985",
-                "dateFormatted": "1985-12-31",
-                "sharesMln": "13837.8240",
-                "shares": 13837824000
+                "sharesMln": "23993.0000",
+                "shares": 23993000000
             }
         },
         "quarterly": {
             "0": {
                 "date": "2021-Q1",
                 "dateFormatted": "2021-03-31",
-                "sharesMln": "16929.1570",
-                "shares": 16929157000
+                "sharesMln": "16929.0000",
+                "shares": 16929000000
             },
             "1": {
                 "date": "2020-Q4",
                 "dateFormatted": "2020-12-31",
-                "sharesMln": "17113.6880",
-                "shares": 17113687999.999998
+                "sharesMln": "17114.0000",
+                "shares": 17114000000
             },
             "2": {
                 "date": "2020-Q3",
                 "dateFormatted": "2020-09-30",
-                "sharesMln": "17256.5210",
-                "shares": 17256521000
+                "sharesMln": "17528.0000",
+                "shares": 17528000000
             },
             "3": {
                 "date": "2020-Q2",
                 "dateFormatted": "2020-06-30",
-                "sharesMln": "17419.1520",
-                "shares": 17419152000
+                "sharesMln": "17419.0000",
+                "shares": 17419000000
             },
             "4": {
                 "date": "2020-Q1",
                 "dateFormatted": "2020-03-31",
-                "sharesMln": "17618.7640",
-                "shares": 17618764000
+                "sharesMln": "17619.0000",
+                "shares": 17619000000
             },
             "5": {
                 "date": "2019-Q4",
                 "dateFormatted": "2019-12-31",
-                "sharesMln": "17818.4160",
-                "shares": 17818416000
+                "sharesMln": "17818.0000",
+                "shares": 17818000000
             },
             "6": {
                 "date": "2019-Q3",
                 "dateFormatted": "2019-09-30",
-                "sharesMln": "18081.4920",
-                "shares": 18081492000
+                "sharesMln": "18596.0000",
+                "shares": 18596000000
             },
             "7": {
                 "date": "2019-Q2",
                 "dateFormatted": "2019-06-30",
-                "sharesMln": "18405.5200",
-                "shares": 18405520000
+                "sharesMln": "18406.0000",
+                "shares": 18406000000
             },
             "8": {
                 "date": "2019-Q1",
                 "dateFormatted": "2019-03-31",
-                "sharesMln": "18802.5840",
-                "shares": 18802584000
+                "sharesMln": "18803.0000",
+                "shares": 18803000000
             },
             "9": {
                 "date": "2018-Q4",
                 "dateFormatted": "2018-12-31",
-                "sharesMln": "19093.0080",
-                "shares": 19093008000
+                "sharesMln": "19093.0000",
+                "shares": 19093000000
             },
             "10": {
                 "date": "2018-Q3",
                 "dateFormatted": "2018-09-30",
-                "sharesMln": "19390.1880",
-                "shares": 19390188000
+                "sharesMln": "20000.0000",
+                "shares": 20000000000
             },
             "11": {
                 "date": "2018-Q2",
                 "dateFormatted": "2018-06-30",
-                "sharesMln": "19706.4360",
-                "shares": 19706436000
+                "sharesMln": "19706.0000",
+                "shares": 19706000000
             },
             "12": {
                 "date": "2018-Q1",
                 "dateFormatted": "2018-03-31",
-                "sharesMln": "20273.9720",
-                "shares": 20273972000
+                "sharesMln": "20274.0000",
+                "shares": 20274000000
             },
             "13": {
                 "date": "2017-Q4",
                 "dateFormatted": "2017-12-31",
-                "sharesMln": "20631.1480",
-                "shares": 20631148000
+                "sharesMln": "20631.0000",
+                "shares": 20631000000
             },
             "14": {
                 "date": "2017-Q3",
                 "dateFormatted": "2017-09-30",
-                "sharesMln": "20734.3400",
-                "shares": 20734340000
+                "sharesMln": "21007.0000",
+                "shares": 21007000000
             },
             "15": {
                 "date": "2017-Q2",
                 "dateFormatted": "2017-06-30",
-                "sharesMln": "20933.9960",
-                "shares": 20933996000
+                "sharesMln": "20934.0000",
+                "shares": 20934000000
             },
             "16": {
                 "date": "2017-Q1",
                 "dateFormatted": "2017-03-31",
-                "sharesMln": "21046.7520",
-                "shares": 21046752000
+                "sharesMln": "21047.0000",
+                "shares": 21047000000
             },
             "17": {
                 "date": "2016-Q4",
                 "dateFormatted": "2016-12-31",
-                "sharesMln": "21311.9800",
-                "shares": 21311980000
+                "sharesMln": "21312.0000",
+                "shares": 21312000000
             },
             "18": {
                 "date": "2016-Q3",
                 "dateFormatted": "2016-09-30",
-                "sharesMln": "21573.3320",
-                "shares": 21573332000
+                "sharesMln": "22001.0000",
+                "shares": 22001000000
             },
             "19": {
                 "date": "2016-Q2",
                 "dateFormatted": "2016-06-30",
-                "sharesMln": "21891.1240",
-                "shares": 21891124000
+                "sharesMln": "21891.0000",
+                "shares": 21891000000
             },
             "20": {
                 "date": "2016-Q1",
                 "dateFormatted": "2016-03-31",
-                "sharesMln": "22163.5440",
-                "shares": 22163544000
+                "sharesMln": "22164.0000",
+                "shares": 22164000000
             },
             "21": {
                 "date": "2015-Q4",
                 "dateFormatted": "2015-12-31",
-                "sharesMln": "22376.5080",
-                "shares": 22376508000
+                "sharesMln": "22377.0000",
+                "shares": 22377000000
             },
             "22": {
                 "date": "2015-Q3",
                 "dateFormatted": "2015-09-30",
-                "sharesMln": "22730.0760",
-                "shares": 22730076000
+                "sharesMln": "23172.0000",
+                "shares": 23172000000
             },
             "23": {
                 "date": "2015-Q2",
                 "dateFormatted": "2015-06-30",
-                "sharesMln": "23092.3960",
-                "shares": 23092396000
+                "sharesMln": "23092.0000",
+                "shares": 23092000000
             },
             "24": {
                 "date": "2015-Q1",
                 "dateFormatted": "2015-03-31",
-                "sharesMln": "23339.4320",
-                "shares": 23339432000
+                "sharesMln": "23339.0000",
+                "shares": 23339000000
             },
             "25": {
                 "date": "2014-Q4",
                 "dateFormatted": "2014-12-31",
-                "sharesMln": "23527.2120",
-                "shares": 23527212000
+                "sharesMln": "23527.0000",
+                "shares": 23527000000
             },
             "26": {
                 "date": "2014-Q3",
                 "dateFormatted": "2014-09-30",
-                "sharesMln": "23888.3280",
-                "shares": 23888328000
+                "sharesMln": "24491.0000",
+                "shares": 24491000000
             },
             "27": {
                 "date": "2014-Q2",
                 "dateFormatted": "2014-06-30",
-                "sharesMln": "24206.8440",
-                "shares": 24206844000
+                "sharesMln": "24207.0000",
+                "shares": 24207000000
             },
             "28": {
                 "date": "2014-Q1",
                 "dateFormatted": "2014-03-31",
-                "sharesMln": "24626.7840",
-                "shares": 24626784000
+                "sharesMln": "24627.0000",
+                "shares": 24627000000
             },
             "29": {
                 "date": "2013-Q4",
                 "dateFormatted": "2013-12-31",
-                "sharesMln": "25240.6560",
-                "shares": 25240656000
+                "sharesMln": "25241.0000",
+                "shares": 25241000000
             },
             "30": {
                 "date": "2013-Q3",
                 "dateFormatted": "2013-09-30",
-                "sharesMln": "25455.6680",
-                "shares": 25455668000
+                "sharesMln": "26087.0000",
+                "shares": 26087000000
             },
             "31": {
                 "date": "2013-Q2",
                 "dateFormatted": "2013-06-30",
-                "sharesMln": "25879.4200",
-                "shares": 25879420000
+                "sharesMln": "25879.0000",
+                "shares": 25879000000
             },
             "32": {
                 "date": "2013-Q1",
                 "dateFormatted": "2013-03-31",
-                "sharesMln": "26488.9800",
-                "shares": 26488980000
+                "sharesMln": "26489.0000",
+                "shares": 26489000000
             },
             "33": {
                 "date": "2012-Q4",
                 "dateFormatted": "2012-12-31",
-                "sharesMln": "26522.0760",
-                "shares": 26522076000
+                "sharesMln": "26522.0000",
+                "shares": 26522000000
             },
             "34": {
                 "date": "2012-Q3",
                 "dateFormatted": "2012-09-30",
-                "sharesMln": "26549.2080",
-                "shares": 26549208000
+                "sharesMln": "26470.0000",
+                "shares": 26470000000
             },
             "35": {
                 "date": "2012-Q2",
                 "dateFormatted": "2012-06-30",
-                "sharesMln": "26517.6520",
-                "shares": 26517652000
+                "sharesMln": "26518.0000",
+                "shares": 26518000000
             },
             "36": {
                 "date": "2012-Q1",
                 "dateFormatted": "2012-03-31",
-                "sharesMln": "26457.0040",
-                "shares": 26457004000
+                "sharesMln": "26457.0000",
+                "shares": 26457000000
             },
             "37": {
                 "date": "2011-Q4",
                 "dateFormatted": "2011-12-31",
-                "sharesMln": "26364.0160",
-                "shares": 26364016000
+                "sharesMln": "26364.0000",
+                "shares": 26364000000
             },
             "38": {
                 "date": "2011-Q3",
                 "dateFormatted": "2011-09-30",
-                "sharesMln": "26306.4760",
-                "shares": 26306476000
+                "sharesMln": "26226.0000",
+                "shares": 26226000000
             },
             "39": {
                 "date": "2011-Q2",
                 "dateFormatted": "2011-06-30",
-                "sharesMln": "26258.6800",
-                "shares": 26258680000
+                "sharesMln": "26259.0000",
+                "shares": 26259000000
             },
             "40": {
                 "date": "2011-Q1",
                 "dateFormatted": "2011-03-31",
-                "sharesMln": "26206.4320",
-                "shares": 26206432000
+                "sharesMln": "26206.0000",
+                "shares": 26206000000
             },
             "41": {
                 "date": "2010-Q4",
                 "dateFormatted": "2010-12-31",
-                "sharesMln": "26128.3120",
-                "shares": 26128312000
+                "sharesMln": "26128.0000",
+                "shares": 26128000000
             },
             "42": {
                 "date": "2010-Q3",
                 "dateFormatted": "2010-09-30",
-                "sharesMln": "25541.5160",
-                "shares": 25541516000
+                "sharesMln": "25892.0000",
+                "shares": 25892000000
             },
             "43": {
                 "date": "2010-Q2",
                 "dateFormatted": "2010-06-30",
-                "sharesMln": "25966.1080",
-                "shares": 25966108000
+                "sharesMln": "25966.0000",
+                "shares": 25966000000
             },
             "44": {
                 "date": "2010-Q1",
                 "dateFormatted": "2010-03-31",
-                "sharesMln": "25840.5840",
-                "shares": 25840584000
+                "sharesMln": "25841.0000",
+                "shares": 25841000000
             },
             "45": {
                 "date": "2009-Q4",
                 "dateFormatted": "2009-12-31",
-                "sharesMln": "25753.9240",
-                "shares": 25753924000
+                "sharesMln": "25754.0000",
+                "shares": 25754000000
             },
             "46": {
                 "date": "2009-Q3",
                 "dateFormatted": "2009-09-30",
-                "sharesMln": "25602.4720",
-                "shares": 25602472000
+                "sharesMln": "25396.0000",
+                "shares": 25396000000
             },
             "47": {
                 "date": "2009-Q2",
                 "dateFormatted": "2009-06-30",
-                "sharesMln": "25456.4800",
-                "shares": 25456480000
+                "sharesMln": "25456.0000",
+                "shares": 25456000000
             },
             "48": {
                 "date": "2009-Q1",
                 "dateFormatted": "2009-03-31",
-                "sharesMln": "25283.8040",
-                "shares": 25283804000
+                "sharesMln": "25284.0000",
+                "shares": 25284000000
             },
             "49": {
                 "date": "2008-Q4",
                 "dateFormatted": "2008-12-31",
-                "sharesMln": "25241.8320",
-                "shares": 25241832000
+                "sharesMln": "25242.0000",
+                "shares": 25242000000
             },
             "50": {
                 "date": "2008-Q3",
                 "dateFormatted": "2008-09-30",
-                "sharesMln": "24744.6640",
-                "shares": 24744664000
+                "sharesMln": "25260.0000",
+                "shares": 25260000000
             },
             "51": {
                 "date": "2008-Q2",
                 "dateFormatted": "2008-06-30",
-                "sharesMln": "25288.6760",
-                "shares": 25288676000
+                "sharesMln": "25289.0000",
+                "shares": 25289000000
             },
             "52": {
                 "date": "2008-Q1",
                 "dateFormatted": "2008-03-31",
-                "sharesMln": "25181.2120",
-                "shares": 25181212000
+                "sharesMln": "25181.0000",
+                "shares": 25181000000
             },
             "53": {
                 "date": "2007-Q4",
                 "dateFormatted": "2007-12-31",
-                "sharesMln": "25201.5120",
-                "shares": 25201512000
+                "sharesMln": "25202.0000",
+                "shares": 25202000000
             },
             "54": {
                 "date": "2007-Q3",
                 "dateFormatted": "2007-09-30",
-                "sharesMln": "24524.0800",
-                "shares": 24524080000
+                "sharesMln": "24900.0000",
+                "shares": 24900000000
             },
             "55": {
                 "date": "2007-Q2",
                 "dateFormatted": "2007-06-30",
-                "sharesMln": "24938.7880",
-                "shares": 24938788000
+                "sharesMln": "24939.0000",
+                "shares": 24939000000
             },
             "56": {
                 "date": "2007-Q1",
                 "dateFormatted": "2007-03-31",
-                "sharesMln": "24826.2840",
-                "shares": 24826284000
+                "sharesMln": "24826.0000",
+                "shares": 24826000000
             },
             "57": {
                 "date": "2006-Q4",
                 "dateFormatted": "2006-12-31",
-                "sharesMln": "24732.3160",
-                "shares": 24732316000
+                "sharesMln": "24732.0000",
+                "shares": 24732000000
             },
             "58": {
                 "date": "2006-Q3",
                 "dateFormatted": "2006-09-30",
-                "sharesMln": "23838.5000",
-                "shares": 23838500000
+                "sharesMln": "24571.0000",
+                "shares": 24571000000
             },
             "59": {
                 "date": "2006-Q2",
                 "dateFormatted": "2006-06-30",
-                "sharesMln": "24538.3040",
-                "shares": 24538304000
+                "sharesMln": "24538.0000",
+                "shares": 24538000000
             },
             "60": {
                 "date": "2006-Q1",
                 "dateFormatted": "2006-03-31",
-                "sharesMln": "24599.0360",
-                "shares": 24599036000
+                "sharesMln": "24599.0000",
+                "shares": 24599000000
             },
             "61": {
                 "date": "2005-Q4",
                 "dateFormatted": "2005-12-31",
-                "sharesMln": "24477.7960",
-                "shares": 24477796000
+                "sharesMln": "24478.0000",
+                "shares": 24478000000
             },
             "62": {
                 "date": "2005-Q3",
                 "dateFormatted": "2005-09-30",
-                "sharesMln": "22822.5760",
-                "shares": 22822576000
+                "sharesMln": "23993.0000",
+                "shares": 23993000000
             },
             "63": {
                 "date": "2005-Q2",
                 "dateFormatted": "2005-06-30",
-                "sharesMln": "24099.2640",
-                "shares": 24099264000
+                "sharesMln": "24102.0000",
+                "shares": 24102000000
             },
             "64": {
                 "date": "2005-Q1",
                 "dateFormatted": "2005-03-31",
-                "sharesMln": "23996.3080",
-                "shares": 23996308000
-            },
-            "65": {
-                "date": "2004-Q4",
-                "dateFormatted": "2004-12-31",
-                "sharesMln": "23468.8720",
-                "shares": 23468872000
-            },
-            "66": {
-                "date": "2004-Q3",
-                "dateFormatted": "2004-09-30",
-                "sharesMln": "21001.2880",
-                "shares": 21001288000
-            },
-            "67": {
-                "date": "2004-Q2",
-                "dateFormatted": "2004-06-30",
-                "sharesMln": "21986.7760",
-                "shares": 21986776000
-            },
-            "68": {
-                "date": "2004-Q1",
-                "dateFormatted": "2004-03-31",
-                "sharesMln": "21180.8800",
-                "shares": 21180880000
-            },
-            "69": {
-                "date": "2003-Q4",
-                "dateFormatted": "2003-12-31",
-                "sharesMln": "20849.2480",
-                "shares": 20849248000
-            },
-            "70": {
-                "date": "2003-Q3",
-                "dateFormatted": "2003-09-30",
-                "sharesMln": "20204.4080",
-                "shares": 20204408000
-            },
-            "71": {
-                "date": "2003-Q2",
-                "dateFormatted": "2003-06-30",
-                "sharesMln": "20371.5120",
-                "shares": 20371512000
-            },
-            "72": {
-                "date": "2003-Q1",
-                "dateFormatted": "2003-03-31",
-                "sharesMln": "20285.6080",
-                "shares": 20285608000
-            },
-            "73": {
-                "date": "2002-Q4",
-                "dateFormatted": "2002-12-31",
-                "sharesMln": "20107.1920",
-                "shares": 20107192000
-            },
-            "74": {
-                "date": "2002-Q3",
-                "dateFormatted": "2002-09-30",
-                "sharesMln": "19956.7200",
-                "shares": 19956720000
-            },
-            "75": {
-                "date": "2002-Q2",
-                "dateFormatted": "2002-06-30",
-                "sharesMln": "20545.3920",
-                "shares": 20545392000
-            },
-            "76": {
-                "date": "2002-Q1",
-                "dateFormatted": "2002-03-31",
-                "sharesMln": "20494.2640",
-                "shares": 20494264000
-            },
-            "77": {
-                "date": "2001-Q4",
-                "dateFormatted": "2001-12-31",
-                "sharesMln": "20020.5040",
-                "shares": 20020504000
-            },
-            "78": {
-                "date": "2001-Q3",
-                "dateFormatted": "2001-09-30",
-                "sharesMln": "19530.8400",
-                "shares": 19530840000
-            },
-            "79": {
-                "date": "2001-Q2",
-                "dateFormatted": "2001-06-30",
-                "sharesMln": "20099.0720",
-                "shares": 20099072000
-            },
-            "80": {
-                "date": "2001-Q1",
-                "dateFormatted": "2001-03-31",
-                "sharesMln": "19757.4720",
-                "shares": 19757472000
-            },
-            "81": {
-                "date": "2000-Q4",
-                "dateFormatted": "2000-12-31",
-                "sharesMln": "18881.5200",
-                "shares": 18881520000
-            },
-            "82": {
-                "date": "2000-Q3",
-                "dateFormatted": "2000-09-30",
-                "sharesMln": "18202.2400",
-                "shares": 18202240000
-            },
-            "83": {
-                "date": "2000-Q2",
-                "dateFormatted": "2000-06-30",
-                "sharesMln": "20261.7520",
-                "shares": 20261752000
-            },
-            "84": {
-                "date": "2000-Q1",
-                "dateFormatted": "2000-03-31",
-                "sharesMln": "20383.2160",
-                "shares": 20383216000
-            },
-            "85": {
-                "date": "1999-Q4",
-                "dateFormatted": "1999-12-31",
-                "sharesMln": "19982.7040",
-                "shares": 19982704000
-            },
-            "86": {
-                "date": "1999-Q3",
-                "dateFormatted": "1999-09-30",
-                "sharesMln": "16134.0480",
-                "shares": 16134048000
-            },
-            "87": {
-                "date": "1999-Q2",
-                "dateFormatted": "1999-06-30",
-                "sharesMln": "19560.8000",
-                "shares": 19560800000
-            },
-            "88": {
-                "date": "1999-Q1",
-                "dateFormatted": "1999-03-31",
-                "sharesMln": "19398.8480",
-                "shares": 19398848000
-            },
-            "89": {
-                "date": "1998-Q4",
-                "dateFormatted": "1998-12-31",
-                "sharesMln": "19270.9440",
-                "shares": 19270944000
-            },
-            "90": {
-                "date": "1998-Q3",
-                "dateFormatted": "1998-09-30",
-                "sharesMln": "15150.2400",
-                "shares": 15150240000
-            },
-            "91": {
-                "date": "1998-Q2",
-                "dateFormatted": "1998-06-30",
-                "sharesMln": "19240.0320",
-                "shares": 19240032000
-            },
-            "92": {
-                "date": "1998-Q1",
-                "dateFormatted": "1998-03-31",
-                "sharesMln": "16342.4800",
-                "shares": 16342480000
-            },
-            "93": {
-                "date": "1997-Q4",
-                "dateFormatted": "1997-12-31",
-                "sharesMln": "15661.9680",
-                "shares": 15661968000
-            },
-            "94": {
-                "date": "1997-Q3",
-                "dateFormatted": "1997-09-30",
-                "sharesMln": "14334.7680",
-                "shares": 14334768000
-            },
-            "95": {
-                "date": "1997-Q2",
-                "dateFormatted": "1997-06-30",
-                "sharesMln": "14168.0000",
-                "shares": 14168000000
-            },
-            "96": {
-                "date": "1997-Q1",
-                "dateFormatted": "1997-03-31",
-                "sharesMln": "14068.2080",
-                "shares": 14068208000
-            },
-            "97": {
-                "date": "1996-Q4",
-                "dateFormatted": "1996-12-31",
-                "sharesMln": "13947.5840",
-                "shares": 13947584000
-            },
-            "98": {
-                "date": "1996-Q3",
-                "dateFormatted": "1996-09-30",
-                "sharesMln": "13858.3200",
-                "shares": 13858320000
-            },
-            "99": {
-                "date": "1996-Q2",
-                "dateFormatted": "1996-06-30",
-                "sharesMln": "13858.3200",
-                "shares": 13858320000
-            },
-            "100": {
-                "date": "1996-Q1",
-                "dateFormatted": "1996-03-31",
-                "sharesMln": "13849.8080",
-                "shares": 13849808000
-            },
-            "101": {
-                "date": "1995-Q4",
-                "dateFormatted": "1995-12-31",
-                "sharesMln": "13775.3280",
-                "shares": 13775328000
-            },
-            "102": {
-                "date": "1995-Q3",
-                "dateFormatted": "1995-09-30",
-                "sharesMln": "13798.7360",
-                "shares": 13798736000
-            },
-            "103": {
-                "date": "1995-Q2",
-                "dateFormatted": "1995-06-30",
-                "sharesMln": "13798.7360",
-                "shares": 13798736000
-            },
-            "104": {
-                "date": "1995-Q1",
-                "dateFormatted": "1995-03-31",
-                "sharesMln": "13736.1280",
-                "shares": 13736128000
-            },
-            "105": {
-                "date": "1994-Q4",
-                "dateFormatted": "1994-12-31",
-                "sharesMln": "13625.4720",
-                "shares": 13625472000
-            },
-            "106": {
-                "date": "1994-Q3",
-                "dateFormatted": "1994-09-30",
-                "sharesMln": "13312.3200",
-                "shares": 13312320000
-            },
-            "107": {
-                "date": "1994-Q2",
-                "dateFormatted": "1994-06-30",
-                "sharesMln": "13312.3200",
-                "shares": 13312320000
-            },
-            "108": {
-                "date": "1994-Q1",
-                "dateFormatted": "1994-03-31",
-                "sharesMln": "13321.7280",
-                "shares": 13321728000
-            },
-            "109": {
-                "date": "1993-Q4",
-                "dateFormatted": "1993-12-31",
-                "sharesMln": "13099.0720",
-                "shares": 13099072000
-            },
-            "110": {
-                "date": "1993-Q2",
-                "dateFormatted": "1993-06-30",
-                "sharesMln": "12859.5122",
-                "shares": 12859512200
-            },
-            "111": {
-                "date": "1993-Q1",
-                "dateFormatted": "1993-03-31",
-                "sharesMln": "13500.8696",
-                "shares": 13500869600
-            },
-            "112": {
-                "date": "1992-Q4",
-                "dateFormatted": "1992-12-31",
-                "sharesMln": "13481.7910",
-                "shares": 13481791000
-            },
-            "113": {
-                "date": "1992-Q2",
-                "dateFormatted": "1992-06-30",
-                "sharesMln": "13657.7778",
-                "shares": 13657777800
-            },
-            "114": {
-                "date": "1992-Q1",
-                "dateFormatted": "1992-03-31",
-                "sharesMln": "13755.6364",
-                "shares": 13755636400
-            },
-            "115": {
-                "date": "1991-Q4",
-                "dateFormatted": "1991-12-31",
-                "sharesMln": "13670.5882",
-                "shares": 13670588200
-            },
-            "116": {
-                "date": "1991-Q2",
-                "dateFormatted": "1991-06-30",
-                "sharesMln": "13516.3636",
-                "shares": 13516363600
-            },
-            "117": {
-                "date": "1991-Q1",
-                "dateFormatted": "1991-03-31",
-                "sharesMln": "13595.5556",
-                "shares": 13595555600
-            },
-            "118": {
-                "date": "1990-Q4",
-                "dateFormatted": "1990-12-31",
-                "sharesMln": "13168.7500",
-                "shares": 13168750000
-            },
-            "119": {
-                "date": "1990-Q2",
-                "dateFormatted": "1990-06-30",
-                "sharesMln": "13976.6667",
-                "shares": 13976666700
-            },
-            "120": {
-                "date": "1990-Q1",
-                "dateFormatted": "1990-03-31",
-                "sharesMln": "14193.8462",
-                "shares": 14193846200
-            },
-            "121": {
-                "date": "1989-Q4",
-                "dateFormatted": "1989-12-31",
-                "sharesMln": "14560.0000",
-                "shares": 14560000000
-            },
-            "122": {
-                "date": "1989-Q2",
-                "dateFormatted": "1989-06-30",
-                "sharesMln": "13889.7920",
-                "shares": 13889792000
-            },
-            "123": {
-                "date": "1989-Q1",
-                "dateFormatted": "1989-03-31",
-                "sharesMln": "14307.6640",
-                "shares": 14307664000
-            },
-            "124": {
-                "date": "1988-Q4",
-                "dateFormatted": "1988-12-31",
-                "sharesMln": "14285.2640",
-                "shares": 14285264000
-            },
-            "125": {
-                "date": "1988-Q2",
-                "dateFormatted": "1988-06-30",
-                "sharesMln": "14622.7200",
-                "shares": 14622720000
-            },
-            "126": {
-                "date": "1988-Q1",
-                "dateFormatted": "1988-03-31",
-                "sharesMln": "13946.3520",
-                "shares": 13946352000
-            },
-            "127": {
-                "date": "1987-Q4",
-                "dateFormatted": "1987-12-31",
-                "sharesMln": "14063.2800",
-                "shares": 14063280000
-            },
-            "128": {
-                "date": "1987-Q2",
-                "dateFormatted": "1987-06-30",
-                "sharesMln": "14028.6720",
-                "shares": 14028672000
-            },
-            "129": {
-                "date": "1987-Q1",
-                "dateFormatted": "1987-03-31",
-                "sharesMln": "14028.6720",
-                "shares": 14028672000
-            },
-            "130": {
-                "date": "1986-Q4",
-                "dateFormatted": "1986-12-31",
-                "sharesMln": "14260.0640",
-                "shares": 14260064000
-            },
-            "131": {
-                "date": "1986-Q2",
-                "dateFormatted": "1986-06-30",
-                "sharesMln": "14260.0640",
-                "shares": 14260064000
-            },
-            "132": {
-                "date": "1986-Q1",
-                "dateFormatted": "1986-03-31",
-                "sharesMln": "14033.6000",
-                "shares": 14033600000
-            },
-            "133": {
-                "date": "1985-Q4",
-                "dateFormatted": "1985-12-31",
-                "sharesMln": "13837.8240",
-                "shares": 13837824000
+                "sharesMln": "23996.0000",
+                "shares": 23996000000
             }
         }
     },
@@ -3123,23 +2584,23 @@
             "2022-09-30": {
                 "date": "2022-09-30",
                 "period": "+1y",
-                "growth": "0.0290",
+                "growth": "0.0310",
                 "earningsEstimateAvg": "5.3500",
                 "earningsEstimateLow": "4.7700",
                 "earningsEstimateHigh": "6.1300",
-                "earningsEstimateYearAgoEps": "5.2000",
-                "earningsEstimateNumberOfAnalysts": "39.0000",
-                "earningsEstimateGrowth": "0.0290",
-                "revenueEstimateAvg": "368899000000.00",
+                "earningsEstimateYearAgoEps": "5.1900",
+                "earningsEstimateNumberOfAnalysts": "40.0000",
+                "earningsEstimateGrowth": "0.0310",
+                "revenueEstimateAvg": "368859000000.00",
                 "revenueEstimateLow": "336323000000.00",
                 "revenueEstimateHigh": "400900000000.00",
                 "revenueEstimateYearAgoEps": null,
-                "revenueEstimateNumberOfAnalysts": "36.00",
+                "revenueEstimateNumberOfAnalysts": "37.00",
                 "revenueEstimateGrowth": "0.0420",
                 "epsTrendCurrent": "5.3500",
-                "epsTrend7daysAgo": "5.3600",
-                "epsTrend30daysAgo": "4.7100",
-                "epsTrend60daysAgo": "4.6800",
+                "epsTrend7daysAgo": "5.3500",
+                "epsTrend30daysAgo": "5.3100",
+                "epsTrend60daysAgo": "4.7000",
                 "epsTrend90daysAgo": "4.6800",
                 "epsRevisionsUpLast7days": "1.0000",
                 "epsRevisionsUpLast30days": "8.0000",
@@ -3149,22 +2610,22 @@
             "2021-09-30": {
                 "date": "2021-09-30",
                 "period": "0y",
-                "growth": "0.5850",
-                "earningsEstimateAvg": "5.2000",
+                "growth": "0.5820",
+                "earningsEstimateAvg": "5.1900",
                 "earningsEstimateLow": "4.7400",
                 "earningsEstimateHigh": "6.4400",
                 "earningsEstimateYearAgoEps": "3.2800",
-                "earningsEstimateNumberOfAnalysts": "39.0000",
-                "earningsEstimateGrowth": "0.5850",
-                "revenueEstimateAvg": "354078000000.00",
+                "earningsEstimateNumberOfAnalysts": "40.0000",
+                "earningsEstimateGrowth": "0.5820",
+                "revenueEstimateAvg": "354075000000.00",
                 "revenueEstimateLow": "337865000000.00",
                 "revenueEstimateHigh": "363437000000.00",
                 "revenueEstimateYearAgoEps": null,
-                "revenueEstimateNumberOfAnalysts": "36.00",
+                "revenueEstimateNumberOfAnalysts": "37.00",
                 "revenueEstimateGrowth": "0.2900",
-                "epsTrendCurrent": "5.2000",
+                "epsTrendCurrent": "5.1900",
                 "epsTrend7daysAgo": "5.2000",
-                "epsTrend30daysAgo": "4.4600",
+                "epsTrend30daysAgo": "5.1600",
                 "epsTrend60daysAgo": "4.4500",
                 "epsTrend90daysAgo": "4.4500",
                 "epsRevisionsUpLast7days": "1.0000",
@@ -3190,12 +2651,12 @@
                 "revenueEstimateGrowth": "0.2210",
                 "epsTrendCurrent": "0.9900",
                 "epsTrend7daysAgo": "0.9900",
-                "epsTrend30daysAgo": "0.8200",
+                "epsTrend30daysAgo": "0.9900",
                 "epsTrend60daysAgo": "0.8200",
                 "epsTrend90daysAgo": "0.8200",
                 "epsRevisionsUpLast7days": "0.0000",
-                "epsRevisionsUpLast30days": "24.0000",
-                "epsRevisionsDownLast30days": "1.0000",
+                "epsRevisionsUpLast30days": "3.0000",
+                "epsRevisionsDownLast30days": "0.0000",
                 "epsRevisionsDownLast90days": null
             },
             "2021-03-31": {
