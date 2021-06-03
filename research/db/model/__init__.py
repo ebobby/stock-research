@@ -5,4 +5,5 @@ from .company_profile import CompanyProfile
 from .daily_price import DailyPrice
 from .error import Error
 from .income_statement import IncomeStatement
+from .statistics import Statistics
 from .stock import Stock

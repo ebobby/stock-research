@@ -9,6 +9,7 @@ config = {
         "user": "stocks",
         "password": "research",
         "prefix": "",
+        "log_queries": True,
     }
 }
 

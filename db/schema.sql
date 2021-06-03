@@ -337,6 +337,73 @@ CREATE TABLE public.migrations (
 
 
 --
+-- Name: statistics; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.statistics (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    market_capitalization numeric(20,5) NOT NULL,
+    wallstreet_target_price numeric(20,5) NOT NULL,
+    pe_ratio numeric(20,5) NOT NULL,
+    peg_ratio numeric(20,5) NOT NULL,
+    book_value_per_share numeric(20,5) NOT NULL,
+    earnings_per_share numeric(20,5) NOT NULL,
+    dividend_per_share numeric(20,5) NOT NULL,
+    dividend_yield numeric(20,5) NOT NULL,
+    profit_margin numeric(20,5) NOT NULL,
+    diluted_eps_ttm numeric(20,5) NOT NULL,
+    gross_profit_ttm numeric(20,5) NOT NULL,
+    price_to_sales_ttm numeric(20,5) NOT NULL,
+    operating_margin_ttm numeric(20,5) NOT NULL,
+    return_on_assets_ttm numeric(20,5) NOT NULL,
+    return_on_equity_ttm numeric(20,5) NOT NULL,
+    revenue_per_share_ttm numeric(20,5) NOT NULL,
+    revenue_ttm numeric(20,5) NOT NULL,
+    price_to_book_mrq numeric(20,5) NOT NULL,
+    quarterly_revenue_growth_yoy numeric(20,5) NOT NULL,
+    quarterly_earnings_growth_yoy numeric(20,5) NOT NULL,
+    outstanding_shares numeric(20,5) NOT NULL,
+    floating_shares numeric(20,5) NOT NULL,
+    percent_insiders numeric(20,5) NOT NULL,
+    percent_institutions numeric(20,5) NOT NULL,
+    short_ratio numeric(20,5) NOT NULL,
+    short_percent numeric(20,5) NOT NULL,
+    beta numeric(20,5) NOT NULL,
+    eps_estimate_current_year numeric(20,5) NOT NULL,
+    eps_estimate_next_year numeric(20,5) NOT NULL,
+    eps_estimate_current_quarter numeric(20,5) NOT NULL,
+    eps_estimate_next_quarter numeric(20,5) NOT NULL,
+    growth_estimate_current_quarter numeric(20,5) NOT NULL,
+    growth_estimate_current_year numeric(20,5) NOT NULL,
+    growth_estimate_next_year numeric(20,5) NOT NULL,
+    most_recent_quarter date,
+    source text NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: statistics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.statistics_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: statistics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.statistics_id_seq OWNED BY public.statistics.id;
+
+
+--
 -- Name: stocks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -413,6 +480,13 @@ ALTER TABLE ONLY public.errors ALTER COLUMN id SET DEFAULT nextval('public.error
 --
 
 ALTER TABLE ONLY public.income_statements ALTER COLUMN id SET DEFAULT nextval('public.income_statements_id_seq'::regclass);
+
+
+--
+-- Name: statistics id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.statistics ALTER COLUMN id SET DEFAULT nextval('public.statistics_id_seq'::regclass);
 
 
 --
@@ -511,6 +585,22 @@ ALTER TABLE ONLY public.income_statements
 
 
 --
+-- Name: statistics statistics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.statistics
+    ADD CONSTRAINT statistics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: statistics statistics_stock_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.statistics
+    ADD CONSTRAINT statistics_stock_id_unique UNIQUE (stock_id);
+
+
+--
 -- Name: stocks stocks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -589,6 +679,14 @@ ALTER TABLE ONLY public.income_statements
 
 
 --
+-- Name: statistics statistics_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.statistics
+    ADD CONSTRAINT statistics_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -615,12 +713,13 @@ SET row_security = off;
 --
 
 INSERT INTO public.migrations VALUES ('2021_05_01_024853_create_stocks_table', 1);
-INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 1);
-INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 2);
-INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 2);
-INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statements_table', 2);
-INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table', 3);
-INSERT INTO public.migrations VALUES ('2021_05_27_210259_create_table_data_errors', 4);
+INSERT INTO public.migrations VALUES ('2021_05_09_035031_create_daily_prices_table', 2);
+INSERT INTO public.migrations VALUES ('2021_05_10_052729_create_income_statements_table', 3);
+INSERT INTO public.migrations VALUES ('2021_05_21_180714_create_balance_sheets_table', 3);
+INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statements_table', 3);
+INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table', 4);
+INSERT INTO public.migrations VALUES ('2021_05_27_210259_create_table_data_errors', 5);
+INSERT INTO public.migrations VALUES ('2021_06_03_044026_create_statistics_table', 6);
 
 
 --

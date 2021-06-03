@@ -28,6 +28,12 @@ class Stock(Model):
 
         return CompanyProfile
 
+    @has_one
+    def statistics(self):
+        from .statistics import Statistics
+
+        return Statistics
+
     @has_many
     def income_statements(self):
         from .income_statement import IncomeStatement
