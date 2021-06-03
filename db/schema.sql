@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.10.1)
--- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.10.1)
+-- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
+-- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -165,12 +165,15 @@ CREATE TABLE public.company_profiles (
     location text NOT NULL,
     sector text NOT NULL,
     industry text NOT NULL,
+    gic_sector text NOT NULL,
+    gic_group text NOT NULL,
+    gic_industry text NOT NULL,
+    gic_sub_industry text NOT NULL,
     isin text,
     cusip text,
     cik text,
     is_delisted boolean NOT NULL,
     fulltime_employees bigint NOT NULL,
-    market_capitalization numeric(20,5) NOT NULL,
     ipo_date date,
     last_update_date date,
     source text NOT NULL,
@@ -593,8 +596,8 @@ ALTER TABLE ONLY public.income_statements
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.10.1)
--- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.10.1)
+-- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
+-- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;

@@ -25,6 +25,11 @@ class CreateCompaniesTable(Migration):
             table.text("sector")
             table.text("industry")
 
+            table.text("gic_sector")
+            table.text("gic_group")
+            table.text("gic_industry")
+            table.text("gic_sub_industry")
+
             table.text("isin").nullable()
             table.text("cusip").nullable()
             table.text("cik").nullable()
@@ -32,7 +37,6 @@ class CreateCompaniesTable(Migration):
             table.boolean("is_delisted")
 
             table.big_integer("fulltime_employees")
-            table.decimal("market_capitalization", 20, 5)
 
             table.date("ipo_date").nullable()
             table.date("last_update_date").nullable()
