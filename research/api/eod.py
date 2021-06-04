@@ -80,3 +80,14 @@ class EOD:
         return self._call_api(
             "bulk-fundamentals", exchange.upper(), symbols=symbols, fmt="json"
         )
+
+    def bulk_eod(self, exchange, date=None, symbols=None, filter=None):
+        """Bulk end-of-day prices data feed."""
+        return self._call_api(
+            "eod-bulk-last-day",
+            exchange.upper(),
+            date=date,
+            symbols=symbols,
+            filter=filter,
+            fmt="json",
+        )
