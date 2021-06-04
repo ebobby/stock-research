@@ -20,6 +20,8 @@ class CreateDailyPricesTable(Migration):
             table.decimal("adjusted_close", 20, 4)
             table.big_integer("volume")
 
+            table.text("source")
+
             # Timestamps
             table.timestamps()
 

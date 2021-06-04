@@ -17,6 +17,8 @@ class CreateStocksTable(Migration):
             table.text("exchange")
             table.boolean("active")
 
+            table.text("source")
+
             # Timestamps
             table.timestamps()
 

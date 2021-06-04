@@ -211,6 +211,7 @@ CREATE TABLE public.daily_prices (
     close numeric(20,4) NOT NULL,
     adjusted_close numeric(20,4) NOT NULL,
     volume bigint NOT NULL,
+    source text NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
@@ -409,6 +410,7 @@ CREATE TABLE public.stocks (
     currency text NOT NULL,
     exchange text NOT NULL,
     active boolean NOT NULL,
+    source text NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
