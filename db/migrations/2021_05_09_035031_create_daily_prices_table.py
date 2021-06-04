@@ -19,8 +19,6 @@ class CreateDailyPricesTable(Migration):
             table.decimal("close", 20, 4)
             table.decimal("adjusted_close", 20, 4)
             table.big_integer("volume")
-            table.decimal("dividends", 20, 4).default(0.0)
-            table.decimal("split_coefficient", 20, 4).default(1.0)
 
             # Timestamps
             table.timestamps()

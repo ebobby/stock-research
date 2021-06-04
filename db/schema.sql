@@ -211,8 +211,6 @@ CREATE TABLE public.daily_prices (
     close numeric(20,4) NOT NULL,
     adjusted_close numeric(20,4) NOT NULL,
     volume bigint NOT NULL,
-    dividends numeric(20,4) DEFAULT 0.0 NOT NULL,
-    split_coefficient numeric(20,4) DEFAULT 1.0 NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
