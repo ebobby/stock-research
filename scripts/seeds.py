@@ -169,6 +169,81 @@ def fundamentals():
     logger.info(f"Fundamentals sync finished, {processed} stocks processed.")
 
 
+def prices(day=date.today()):
+    """Imports day stocks prices EOD into the database."""
+    logger = logging.getLogger("stock price sync")
+
+    api = EOD()
+
+    logger.info(f"Stock price sync for {day} started")
+
+    if day.weekday() > 4:
+        logger.info("No price data during weekends.")
+        return
+
+    # Fetch all available stocks
+    logger.info(f"Fetching day eod stock prices for {day} from EOD")
+    eod_list = api.bulk_eod("US", date=day.strftime(DATE_FORMAT))
+
+    if not eod_list:
+        logger.info("No price data. Maybe holiday?")
+        return
+
+    if "error" in eod_list:
+        logger.error(f"Error while fetching end of day price data: {eod_list['error']}")
+        return
+
+    # Turn EOD list into a dict for faster lookup.
+    eod_data = {p["code"]: p for p in eod_list}
+    eod_list = None
+
+    stocks = list(Stock.where("active", True).order_by("symbol").get())
+
+    saved = 0
+    for stock in stocks:
+
+        def money_field(report, field):
+            value = parse.float_or(report.get(field, 0.0), 0.0)
+
+            if len(format(value, "f").split(".")[0]) > 15:
+                stock.add_error(
+                    f"Invalid value {value} in column {field} for end-of-day price for {date}.",
+                    "eod",
+                )
+                logger.error(
+                    f"Invalid value {value} in column {field} for end-of-day price for {date}.",
+                )
+                return 0.0
+
+            return value
+
+        daily_price = stock.daily_prices().where("date", day).first() or DailyPrice()
+
+        price = eod_data.get(stock.symbol_for_api)
+
+        if not price:
+            logger.info(f"End-of-day price data not found for {stock.symbol_for_api}")
+            continue
+
+        daily_price.date = day
+        daily_price.open = money_field(price, "open")
+        daily_price.high = money_field(price, "high")
+        daily_price.low = money_field(price, "low")
+        daily_price.close = money_field(price, "close")
+        daily_price.adjusted_close = money_field(price, "adjusted_close")
+        daily_price.volume = int(money_field(price, "volume"))
+        daily_price.source = "eod"
+
+        if "created_at" in daily_price.attributes_to_dict():
+            daily_price.save()
+        else:
+            stock.daily_prices().save(daily_price)
+
+        saved += 1
+
+    logger.info(f"Stock end-of-day prices sync finished, saved={saved}")
+
+
 def process_income_statements(stock, report_type, reports, logger):
     for report in reports:
         report_date = datetime.strptime(report["date"], DATE_FORMAT)
