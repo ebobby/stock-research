@@ -5,16 +5,16 @@ import logging
 import sys
 from datetime import date, datetime
 
+from research.api import EOD, Polygon
 from research.db.config import db
-
-from research.api import EOD
 from research.db.model import (
     BalanceSheet,
     CashFlowStatement,
     CompanyProfile,
+    DailyPrice,
     IncomeStatement,
-    Stock,
     Statistics,
+    Stock,
 )
 from research.utils import parse
 
@@ -34,30 +34,45 @@ DATE_FORMAT = "%Y-%m-%d"
 
 
 def stocks():
-    """Import stocks from EOD into the database."""
+    """Import stocks from polygon and eod into the database."""
     logger = logging.getLogger("stock sync")
 
-    api = EOD()
+    logger.info("Stocks sync started")
 
-    logger.info("Stock sync started")
+    # APIs
+    pol_api = Polygon()
+    eod_api = EOD()
+
+    # Fetch all available stocks from polygon
+    logger.info("Fetching current stock list from Polygon.io")
+    pol_tickers = pol_api.tickers(aggregate=True, type="CS", limit=1000)
+    logger.info(f"{len(pol_tickers)} active stocks found")
 
     # Fetch all available stocks
     logger.info("Fetching current stock list from EOD")
-    tickers = [
+    eod_tickers = [
         ticker
-        for ticker in api.exchange_symbol_list()
+        for ticker in eod_api.exchange_symbol_list()
         if ticker["Type"] == "Common Stock"
         and ticker["Exchange"] in ["NASDAQ", "NYSE", "NYSE ARCA", "NYSE MKT"]
         and "test" not in ticker["Name"].lower()
     ]
-    logger.info(f"{len(tickers)} stocks found")
+    logger.info(f"{len(eod_tickers)} stocks found")
+
+    # Get the intersection of polygon valid tickers and EOD's
+    valid = set(t["ticker"] for t in pol_tickers if t["active"]).intersection(
+        set(t["Code"] for t in eod_tickers)
+    )
 
     # First set all stocks to inactive.
     db.table("stocks").update(active=False)
 
     # Update all tickers
-    for ticker in tickers:
-        stock = Stock.where("symbol", ticker["Code"]).first() or Stock()
+    for ticker in eod_tickers:
+        if ticker["Code"] not in valid:
+            continue
+
+        stock = Stock.where_symbol(ticker["Code"]).first() or Stock()
 
         stock.symbol = ticker["Code"]
         stock.name = ticker["Name"]
@@ -65,11 +80,11 @@ def stocks():
         stock.currency = ticker["Currency"]
         stock.exchange = ticker["Exchange"]
         stock.active = True
-
+        stock.source = "eod_polygon"
         stock.save()
 
-    active = Stock.where("active", True).count()
-    inactive = Stock.where("active", False).count()
+    active = Stock.where_active(True).count()
+    inactive = Stock.where_active(False).count()
 
     logger.info(
         f"Stock sync finished, {active} active stocks, {inactive} inactive stocks"
