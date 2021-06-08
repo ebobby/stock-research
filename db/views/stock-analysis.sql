@@ -13,7 +13,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION to_millions(amount DECIMAL) RETURNS DECIMAL AS $$
 BEGIN
-  RETURN ROUND(amount/1000000,2);
+  RETURN ROUND(amount/1000000,6);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -35,7 +35,11 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       company_profiles.exchange,
       company_profiles.sector,
       company_profiles.industry,
-
+      --------------------------------------------------
+      -- Statistics
+      --------------------------------------------------
+      to_millions(statistics.market_capitalization) AS market_capitalization,
+      statistics.beta,
       --------------------------------------------------
       -- income statement
       --------------------------------------------------
@@ -60,6 +64,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       ROUND(CASE WHEN gross_profit <> 0
             THEN operating_income / gross_profit
             ELSE 0 END, 4) AS operating_margin,
+      to_millions(income_statements.interest_expense) as interest_paid,
       ROUND(CASE WHEN operating_income <> 0
             THEN interest_expense / operating_income
             ELSE 0 END, 4) AS interest_to_operating_margin,
@@ -99,6 +104,11 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       ROUND(CASE WHEN balance_sheets.total_stockholder_equity <> 0
             THEN balance_sheets.total_liabilities / balance_sheets.total_stockholder_equity
             ELSE 0 END, 4) AS debt_to_equity,
+      to_millions(balance_sheets.total_capitalization) as capital,
+      ROUND(CASE WHEN balance_sheets.total_capitalization - balance_sheets.cash_and_short_term <> 0
+            THEN (income_statements.operating_income - income_statements.income_tax) /
+                   (balance_sheets.total_capitalization - balance_sheets.cash_and_short_term)
+            ELSE 0 END, 4) AS return_on_capital,
       -- equity
       to_millions(balance_sheets.total_stockholder_equity) AS equity,
       to_millions(balance_sheets.common_stock_equity) AS common_equity,
@@ -112,7 +122,11 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       --------------------------------------------------
       -- cash flow
       --------------------------------------------------
+      to_millions(total_cash_from_operating_activities) AS cash_from_operating_activities,
+      to_millions(total_cash_from_investing_activities) AS cash_from_investing_activities,
+      to_millions(total_cash_from_financing_activities) AS cash_from_financing_activities,
       to_millions(cash_flow_statements.capital_expenditures) AS capital_expenditures,
+      to_millions(free_cash_flow) AS free_cash_flow,
       ROUND(CASE WHEN income_statements.net_earnings <> 0
             THEN cash_flow_statements.capital_expenditures / income_statements.net_earnings
             ELSE 0 END, 4) AS capital_expenditures_to_earnings,
@@ -130,13 +144,14 @@ CREATE MATERIALIZED VIEW stock_general_report AS
             THEN cash_and_short_term / common_stock_shares_outstanding
             ELSE 0 END, 4) AS cash_per_share,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
-            THEN dividends_paid / common_stock_shares_outstanding
+            THEN -dividends_paid / common_stock_shares_outstanding
             ELSE 0 END, 4) AS dividends_per_share,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
             THEN total_stockholder_equity / common_stock_shares_outstanding
             ELSE 0 END, 4) AS equity_per_share
     FROM stocks
-      LEFT OUTER JOIN company_profiles ON stocks.id = company_profiles.stock_id
+      INNER JOIN company_profiles ON stocks.id = company_profiles.stock_id
+      INNER JOIN statistics ON stocks.id = statistics.id
       INNER JOIN income_statements ON stocks.id = income_statements.stock_id
       INNER JOIN balance_sheets ON stocks.id = balance_sheets.stock_id
              AND income_statements.report_date = balance_sheets.report_date
@@ -161,6 +176,8 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     country,
     sector,
     industry,
+    market_capitalization,
+    beta,
     revenue,
     CASE WHEN report_number <> 1
     THEN growth(revenue, LAG(revenue) OVER (ORDER BY symbol, type, date))
@@ -172,6 +189,7 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     depreciation_to_profit,
     operating_income,
     operating_margin,
+    interest_paid,
     interest_to_operating_margin,
     income_before_tax,
     income_tax,
@@ -200,6 +218,8 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     long_term_debt,
     years_to_pay,
     debt_to_equity,
+    capital,
+    return_on_capital,
     equity,
     CASE WHEN report_number <> 1
     THEN growth(equity, LAG(equity) OVER (ORDER BY symbol, type, date))
@@ -212,10 +232,17 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     ELSE 0 END AS retained_earnings_growth,
     treasury_stock,
     return_on_equity,
+    cash_from_operating_activities,
+    cash_from_investing_activities,
+    cash_from_financing_activities,
     capital_expenditures,
     CASE WHEN report_number <> 1
     THEN growth(capital_expenditures, LAG(capital_expenditures) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS capital_expenditures_growth,
+    free_cash_flow,
+    CASE WHEN report_number <> 1
+    THEN growth(free_cash_flow, LAG(free_cash_flow) OVER (ORDER BY symbol, type, date))
+    ELSE 0 END AS free_cash_flow_growth,
     capital_expenditures_to_earnings,
     stock_issuance,
     dividends_paid,
@@ -235,14 +262,17 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
         stock_id,
         symbol,
         company_name,
+        market_capitalization,
         sector,
         industry,
         ROUND(AVG(revenue_growth),2) avg_revenue_growth,
         ROUND(AVG(earnings_growth),2) avg_earnings_growth,
         ROUND(AVG(equity_growth),2) avg_equity_growth,
         ROUND(AVG(profit_margin),2) avg_profit_margin,
+        ROUND(AVG(free_cash_flow_growth),2) avg_free_cash_flow_growth,
         ROUND(AVG(return_on_assets),2) avg_return_on_assets,
         ROUND(AVG(return_on_equity),2) avg_return_on_equity,
+        ROUND(AVG(return_on_capital),2) avg_return_on_capital,
         ROUND(
             REGR_SLOPE(
                 earnings::decimal,
@@ -252,5 +282,5 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
         COUNT(*) years
     FROM stock_general_report_with_growth
     WHERE type = 'Y'
-    GROUP BY stock_id, symbol, company_name, sector, industry
+    GROUP BY stock_id, symbol, company_name, market_capitalization, sector, industry
 );
