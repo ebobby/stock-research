@@ -25,6 +25,8 @@ class CreateCompaniesTable(Migration):
             table.text("sector")
             table.text("industry")
 
+            table.text("category")
+
             table.text("isin").nullable()
             table.text("cusip").nullable()
             table.text("cik").nullable()

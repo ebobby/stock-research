@@ -165,6 +165,7 @@ CREATE TABLE public.company_profiles (
     location text NOT NULL,
     sector text NOT NULL,
     industry text NOT NULL,
+    category text NOT NULL,
     isin text,
     cusip text,
     cik text,
