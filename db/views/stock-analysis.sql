@@ -40,6 +40,8 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       --------------------------------------------------
       to_millions(statistics.market_capitalization) AS market_capitalization,
       statistics.beta,
+      statistics.growth_estimate_next_year,
+      statistics.short_percent,
       --------------------------------------------------
       -- income statement
       --------------------------------------------------
@@ -178,6 +180,8 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     industry,
     market_capitalization,
     beta,
+    growth_estimate_next_year,
+    short_percent,
     revenue,
     CASE WHEN report_number <> 1
     THEN growth(revenue, LAG(revenue) OVER (ORDER BY symbol, type, date))
