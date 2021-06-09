@@ -40,13 +40,7 @@ def stocks():
     logger.info("Stocks sync started")
 
     # APIs
-    pol_api = Polygon()
     eod_api = EOD()
-
-    # Fetch all available stocks from polygon
-    logger.info("Fetching current stock list from Polygon.io")
-    pol_tickers = pol_api.tickers(aggregate=True, type="CS", limit=1000)
-    logger.info(f"{len(pol_tickers)} active stocks found")
 
     # Fetch all available stocks
     logger.info("Fetching current stock list from EOD")
@@ -59,19 +53,11 @@ def stocks():
     ]
     logger.info(f"{len(eod_tickers)} stocks found")
 
-    # Get the intersection of polygon valid tickers and EOD's
-    valid = set(t["ticker"] for t in pol_tickers if t["active"]).intersection(
-        set(t["Code"] for t in eod_tickers)
-    )
-
     # First set all stocks to inactive.
     db.table("stocks").update(active=False)
 
     # Update all tickers
     for ticker in eod_tickers:
-        if ticker["Code"] not in valid:
-            continue
-
         stock = Stock.where_symbol(ticker["Code"]).first() or Stock()
 
         stock.symbol = ticker["Code"]
@@ -80,7 +66,7 @@ def stocks():
         stock.currency = ticker["Currency"]
         stock.exchange = ticker["Exchange"]
         stock.active = True
-        stock.source = "eod_polygon"
+        stock.source = "eod"
         stock.save()
 
     active = Stock.where_active(True).count()
@@ -515,6 +501,7 @@ def process_company_profile(stock, response, logger):
 
     profile.sector = data.get("Sector", "") or ""
     profile.industry = data.get("Industry", "") or ""
+    profile.category = data.get("HomeCategory", "") or ""
 
     profile.isin = data.get("ISIN", "") or ""
     profile.cusip = data.get("CUSIP", "") or ""
