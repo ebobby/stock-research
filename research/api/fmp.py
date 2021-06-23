@@ -83,3 +83,7 @@ class FMP:
             period=period,
             limit=limit,
         )
+
+    def discounted_cash_flow(self, ticker):
+        """This API returns the current calculated DFC for the company."""
+        return self._call_api("v3", f"discounted-cash-flow/{ticker.upper()}")
