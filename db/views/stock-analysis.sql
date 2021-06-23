@@ -1,8 +1,9 @@
 DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report_with_growth;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report;
+DROP FUNCTION growth;
+DROP FUNCTION to_millions;
 
-DROP MATERIALIZED VIEW IF EXISTS stock_general_report;
 CREATE OR REPLACE FUNCTION growth(after DECIMAL, before DECIMAL) RETURNS DECIMAL AS $$
 BEGIN
   RETURN CASE
