@@ -85,14 +85,13 @@ def fundamentals():
 
     api = EOD()
 
-    #    stocks = list(Stock.where("active", True).order_by("symbol").get())
-
-    stocks = list(
-        Stock.where("active", True)
-        .where_raw("id NOT IN (SELECT stock_id FROM company_profiles)")
-        .order_by("symbol")
-        .get()
-    )
+    stocks = list(Stock.where("active", True).order_by("symbol").get())
+    # stocks = list(
+    #    Stock.where("active", True)
+    #    .where_raw("id NOT IN (SELECT stock_id FROM company_profiles)")
+    #    .order_by("symbol")
+    #    .get()
+    # )
 
     logger.info(f"{len(stocks)} active stocks found")
 
