@@ -21,7 +21,7 @@ class FMP:
         self._api_key = api_key or os.environ.get(self.API_KEY_ENV, "")
 
     @sleep_and_retry
-    @limits(calls=60, period=60)
+    @limits(calls=300, period=60)
     def _call_api(self, version, function, **kwargs):
         """Make an API call, handles keyword arguments and api keys."""
         params = {"apikey": self._api_key}
