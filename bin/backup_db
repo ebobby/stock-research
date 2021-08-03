@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 #; -*- mode: sh;-*-
 
-pg_dump -U stocks -h localhost -Fc -O -x --no-comments stock-research > db/backups/`date +"%Y-%m-%d-%H%M%S"`-backup.tar
+pg_dump -U stocks -h localhost -Fc -O -x --no-comments stock-research | gzip > db/backups/`date +"%Y-%m-%d-%H%M%S"`-backup.tar.gz
