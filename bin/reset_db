@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #; -*- mode: sh;-*-
 
-dropdb --user stocks stock-research
-createdb --user stocks stock-research
-psql --u stocks --password stock-research < db/schema.sql
+dropdb   -U stocks -h localhost stock-research
+createdb -U stocks -h localhost stock-research
+psql     -U stocks -h localhost stock-research < db/schema.sql

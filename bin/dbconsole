@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#; -*- mode: sh;-*-
+
+psql -U stocks -h localhost stock-research
