@@ -5,7 +5,7 @@ import logging
 import sys
 from datetime import date, datetime
 
-from research.api import EOD, Polygon
+from research.api import EOD
 from research.db.config import db
 from research.db.model import (
     BalanceSheet,
