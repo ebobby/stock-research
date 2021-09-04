@@ -1,0 +1,21 @@
+# $HOME/.config/tmuxinator/stock-research.yml
+
+name: homeroom
+root: ~/Projects/stock-research/
+
+windows:
+  - repl:
+      - source venv/bin/activate
+      - clear
+  - sql:
+      layout: even-horizontal
+      panes:
+        - one:
+            - source venv/bin/activate
+            - clear
+        - two:
+            - source venv/bin/activate
+            - clear
+  - console:
+      - source venv/bin/activate
+      - clear
