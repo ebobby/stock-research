@@ -1,13 +1,47 @@
+DROP MATERIALIZED VIEW IF EXISTS stock_buffettology;
 DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
+DROP MATERIALIZED VIEW IF EXISTS stock_yearly_report;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report_with_growth;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report;
+DROP AGGREGATE median(anyelement);
 DROP FUNCTION growth;
 DROP FUNCTION to_millions;
+DROP FUNCTION cagr;
+DROP FUNCTION _final_median;
+
+-- From https://wiki.postgresql.org/wiki/Aggregate_Median
+CREATE OR REPLACE FUNCTION _final_median(anyarray) RETURNS decimal AS $$
+  WITH q AS
+  (
+     SELECT val
+     FROM unnest($1) val
+     WHERE VAL IS NOT NULL
+     ORDER BY 1
+  ),
+  cnt AS
+  (
+    SELECT COUNT(*) as c FROM q
+  )
+  SELECT AVG(val)::decimal
+  FROM
+  (
+    SELECT val FROM q
+    LIMIT  2 - MOD((SELECT c FROM cnt), 2)
+    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1,0)
+  ) q2;
+$$ LANGUAGE sql IMMUTABLE;
+
+CREATE OR REPLACE AGGREGATE median(anyelement) (
+  SFUNC=array_append,
+  STYPE=anyarray,
+  FINALFUNC=_final_median,
+  INITCOND='{}'
+);
 
 CREATE OR REPLACE FUNCTION growth(after DECIMAL, before DECIMAL) RETURNS DECIMAL AS $$
 BEGIN
   RETURN CASE
-    WHEN before <> 0 THEN ROUND((after - before) / ABS(before), 2)
+    WHEN before <> 0 THEN ROUND((after - before) / ABS(before), 3)
     ELSE 0 END;
 END;
 $$ LANGUAGE plpgsql;
@@ -15,6 +49,18 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION to_millions(amount DECIMAL) RETURNS DECIMAL AS $$
 BEGIN
   RETURN ROUND(amount/1000000,6);
+END;
+$$ LANGUAGE plpgsql;
+
+-- compound annual growth rate
+CREATE OR REPLACE FUNCTION cagr(ending DECIMAL, beginning DECIMAL, years DECIMAL) RETURNS DECIMAL AS $$
+BEGIN
+  RETURN CASE
+    WHEN beginning = 0 THEN 'NAN'::decimal
+    WHEN ending = 0 THEN 0
+    WHEN ending < 0 THEN -1
+    WHEN beginning < 0 THEN 'NAN'::decimal
+    ELSE ROUND(POWER(ending / beginning, 1::decimal / years) - 1, 3) END;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -26,7 +72,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       stocks.symbol,
       income_statements.report_date AS date,
       income_statements.report_type AS type,
-      RANK() OVER (PARTITION BY stocks.symbol, income_statements.report_type ORDER BY income_statements.report_date) AS report_number,
+      RANK() OVER (PARTITION BY stocks.symbol, income_statements.report_type ORDER BY income_statements.report_date DESC) AS report_number,
       --------------------------------------------------
       -- General
       --------------------------------------------------
@@ -134,14 +180,17 @@ CREATE MATERIALIZED VIEW stock_general_report AS
             THEN cash_flow_statements.capital_expenditures / income_statements.net_earnings
             ELSE 0 END, 4) AS capital_expenditures_to_earnings,
       to_millions(cash_flow_statements.sale_or_purchase_of_stock) AS stock_issuance,
-      to_millions(-cash_flow_statements.dividends_paid) AS dividends_paid,
+      to_millions(-dividends_paid) AS dividends_paid,
+      ROUND(CASE WHEN income_statements.net_earnings <> 0
+            THEN -dividends_paid / income_statements.net_earnings
+            ELSE 0 END, 4) AS dividends_rate,
       -- per share
       common_stock_shares_outstanding::bigint AS shares_outstanding,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
             THEN total_revenue / common_stock_shares_outstanding
             ELSE 0 END, 4) AS revenue_per_share,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
-            THEN income_before_tax / common_stock_shares_outstanding
+            THEN net_earnings / common_stock_shares_outstanding
             ELSE 0 END, 4) AS earnings_per_share,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
             THEN cash_and_short_term / common_stock_shares_outstanding
@@ -151,18 +200,19 @@ CREATE MATERIALIZED VIEW stock_general_report AS
             ELSE 0 END, 4) AS dividends_per_share,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
             THEN total_stockholder_equity / common_stock_shares_outstanding
-            ELSE 0 END, 4) AS equity_per_share
+            ELSE 0 END, 4) AS equity_per_share,
+      EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stocks.id LIMIT 1) AS has_errors
     FROM stocks
-      INNER JOIN company_profiles ON stocks.id = company_profiles.stock_id
-      INNER JOIN statistics ON stocks.id = statistics.id
-      INNER JOIN income_statements ON stocks.id = income_statements.stock_id
-      INNER JOIN balance_sheets ON stocks.id = balance_sheets.stock_id
-             AND income_statements.report_date = balance_sheets.report_date
-             AND income_statements.report_type = balance_sheets.report_type
-      INNER JOIN cash_flow_statements ON stocks.id = cash_flow_statements.stock_id
-             AND income_statements.report_date = cash_flow_statements.report_date
-             AND income_statements.report_type = cash_flow_statements.report_type
-    WHERE stocks.id NOT IN (SELECT DISTINCT stock_id FROM errors)
+        INNER JOIN company_profiles ON stocks.id = company_profiles.stock_id
+        INNER JOIN statistics ON stocks.id = statistics.id
+        INNER JOIN income_statements ON stocks.id = income_statements.stock_id
+        INNER JOIN balance_sheets ON stocks.id = balance_sheets.stock_id
+               AND income_statements.report_date = balance_sheets.report_date
+               AND income_statements.report_type = balance_sheets.report_type
+        INNER JOIN cash_flow_statements ON stocks.id = cash_flow_statements.stock_id
+               AND income_statements.report_date = cash_flow_statements.report_date
+               AND income_statements.report_type = cash_flow_statements.report_type
+    WHERE stocks.active = 't'
     ORDER BY stocks.symbol, income_statements.report_type, income_statements.report_date desc
 );
 
@@ -184,7 +234,7 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     growth_estimate_next_year,
     short_percent,
     revenue,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(revenue, LAG(revenue) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS revenue_growth,
     gross_profit,
@@ -200,11 +250,11 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     income_tax,
     income_tax_rate,
     earnings,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(earnings, LAG(earnings) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS earnings_growth,
     assets,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(assets, LAG(assets) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS assets_growth,
     cash,
@@ -216,7 +266,7 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     long_term_investments,
     return_on_assets,
     liabilities,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(liabilities, LAG(liabilities) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS liabilities_growth,
     short_term_debt,
@@ -226,13 +276,13 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     capital,
     return_on_capital,
     equity,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(equity, LAG(equity) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS equity_growth,
     common_equity,
     preferred_equity,
     retained_earnings,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(retained_earnings, LAG(retained_earnings) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS retained_earnings_growth,
     treasury_stock,
@@ -241,24 +291,37 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     cash_from_investing_activities,
     cash_from_financing_activities,
     capital_expenditures,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(capital_expenditures, LAG(capital_expenditures) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS capital_expenditures_growth,
     free_cash_flow,
-    CASE WHEN report_number <> 1
+    CASE WHEN report_number <> 10
     THEN growth(free_cash_flow, LAG(free_cash_flow) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS free_cash_flow_growth,
     capital_expenditures_to_earnings,
     stock_issuance,
     dividends_paid,
+    dividends_rate,
     shares_outstanding,
     revenue_per_share,
     earnings_per_share,
     dividends_per_share,
     cash_per_share,
-    equity_per_share
+    equity_per_share,
+    has_errors
   FROM stock_general_report
-  ORDER BY symbol, type, date desc
+--  ORDER BY symbol, type, date desc
+);
+
+DROP MATERIALIZED VIEW IF EXISTS stock_yearly_report;
+CREATE MATERIALIZED VIEW stock_yearly_report AS (
+    SELECT
+        *,
+        SUM(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_dividends_per_share,
+        SUM(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_eps
+    FROM stock_general_report_with_growth
+    WHERE report_number <= 10 AND type = 'Y' -- Only last ten years.
+  ORDER BY symbol, date asc
 );
 
 DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
@@ -270,22 +333,165 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
         market_capitalization,
         sector,
         industry,
-        ROUND(AVG(revenue_growth),2) avg_revenue_growth,
-        ROUND(AVG(earnings_growth),2) avg_earnings_growth,
-        ROUND(AVG(equity_growth),2) avg_equity_growth,
-        ROUND(AVG(profit_margin),2) avg_profit_margin,
-        ROUND(AVG(free_cash_flow_growth),2) avg_free_cash_flow_growth,
-        ROUND(AVG(return_on_assets),2) avg_return_on_assets,
-        ROUND(AVG(return_on_equity),2) avg_return_on_equity,
-        ROUND(AVG(return_on_capital),2) avg_return_on_capital,
+        currency,
+        ROUND(AVG(revenue_growth), 3) avg_revenue_growth,
+        ROUND(MEDIAN(revenue_growth), 3) median_revenue_growth,
+        ROUND(AVG(earnings_growth), 3) avg_earnings_growth,
+        ROUND(MEDIAN(earnings_growth), 3) median_earnings_growth,
+        ROUND(AVG(equity_growth), 3) avg_equity_growth,
+        ROUND(MEDIAN(equity_growth), 3) median_equity_growth,
+        ROUND(AVG(profit_margin), 3) avg_profit_margin,
+        ROUND(AVG(free_cash_flow_growth), 3) avg_free_cash_flow_growth,
+        ROUND(AVG(return_on_assets), 3) avg_return_on_assets,
+        ROUND(MEDIAN(return_on_assets), 3) median_return_on_assets,
+        ROUND(AVG(return_on_capital), 3) avg_return_on_capital,
+        ROUND(MEDIAN(return_on_capital), 3) median_return_on_capital,
+        ROUND(AVG(return_on_equity), 3) avg_return_on_equity,
+        ROUND(MEDIAN(return_on_equity), 3) median_return_on_equity,
+        ROUND(AVG(dividends_rate), 3) avg_dividends_rate,
+        ROUND(MEDIAN(dividends_rate), 3) median_dividends_rate,
         ROUND(
-            REGR_SLOPE(
+            -REGR_SLOPE(
                 earnings::decimal,
                 (report_number - 1)::decimal
             )::decimal
-        , 3) trend,
-        COUNT(*) years
-    FROM stock_general_report_with_growth
-    WHERE type = 'Y'
-    GROUP BY stock_id, symbol, company_name, market_capitalization, sector, industry
+        , 3) earnings_trend,
+        COUNT(*) years,
+        EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stock_yearly_report.stock_id LIMIT 1) AS has_errors
+    FROM stock_yearly_report
+    GROUP BY stock_id, symbol, company_name, market_capitalization, sector, industry, currency
+);
+
+DROP MATERIALIZED VIEW IF EXISTS stock_buffettology;
+CREATE MATERIALIZED VIEW stock_buffettology AS (
+    WITH ten_year_old_stocks AS (
+      SELECT stock_id FROM stock_yearly_report WHERE report_number = 10
+    ),
+    latest_prices AS (
+        SELECT
+            stock_id,
+            adjusted_close AS close_price,
+            date AS price_date,
+            RANK() OVER (PARTITION BY stock_id ORDER BY date DESC) AS rank
+        FROM daily_prices
+    ),
+    per_share AS (
+        SELECT DISTINCT
+           stock_id,
+           symbol,
+           (NTH_VALUE(accum_dividends_per_share, 2) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal prev_accum_dividends,
+           (NTH_VALUE(accum_eps, 2) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal prev_accum_eps,
+           (FIRST_VALUE(accum_dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal accum_dividends_per_share,
+           (FIRST_VALUE(accum_eps) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal accum_eps,
+           (FIRST_VALUE(equity_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal equity_per_share,
+           (FIRST_VALUE(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal dividends_per_share,
+           (FIRST_VALUE(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal eps,
+           (NTH_VALUE(earnings_per_share, 5) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal eps_5y,
+           (NTH_VALUE(earnings_per_share, 10) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal eps_10y,
+           (FIRST_VALUE(earnings) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal earnings,
+           (NTH_VALUE(earnings, 5) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal earnings_5y,
+           (NTH_VALUE(earnings, 10) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal earnings_10y
+        FROM stock_yearly_report
+    ),
+    currencies AS (
+        SELECT
+            stock_id,
+            currency,
+            report_date,
+            report_type,
+            RANK() OVER (PARTITION BY stock_id, report_type ORDER BY stock_id, report_type, report_date DESC) AS rank
+        FROM income_statements
+        WHERE report_type = 'Y'
+    )
+    SELECT
+        averages.stock_id,
+        averages.symbol,
+        averages.company_name,
+        averages.market_capitalization AS market_cap,
+        averages.sector,
+        averages.industry,
+        company_profiles.category,
+        currencies.currency,
+        averages.has_errors,
+        averages.earnings_trend,
+        averages.median_earnings_growth,
+        averages.median_equity_growth,
+        averages.median_return_on_equity,
+        averages.median_dividends_rate,
+        per_share.equity_per_share,
+        per_share.dividends_per_share,
+        per_share.eps,
+        per_share.eps_5y,
+        per_share.eps_10y,
+        per_share.earnings,
+        per_share.earnings_5y,
+        per_share.earnings_10y,
+        CAGR(per_share.eps, per_share.eps_5y, 5) AS eps_cagr_5y,
+        CAGR(per_share.eps, per_share.eps_10y, 10) AS eps_cagr_10y,
+        CAGR(per_share.earnings, per_share.earnings_5y, 5) AS earnings_cagr_5y,
+        CAGR(per_share.earnings, per_share.earnings_10y, 10) AS earnings_cagr_10y,
+        per_share.accum_dividends_per_share,
+        per_share.accum_eps,
+        CASE
+          WHEN (per_share.prev_accum_eps - per_share.prev_accum_dividends) <> 0 THEN ROUND((per_share.eps - per_share.eps_10y) / (per_share.prev_accum_eps - per_share.prev_accum_dividends), 3)
+          ELSE 'NaN'::decimal END AS return_on_retained_earnings,
+        latest_prices.close_price AS price,
+        ROUND(latest_prices.close_price / per_share.eps, 3) AS pe_ratio,
+        ROUND(latest_prices.close_price / per_share.eps / 2, 3) AS pe_ratio_over_two,
+        ROUND(per_share.eps / latest_prices.close_price, 3) irr,
+        ROUND(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10),
+            3
+        ) future_eps,
+        ROUND(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10),
+            3
+        ) future_equity_per_share,
+        ROUND(
+            (per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10)) / latest_prices.close_price,
+            3
+        ) AS future_rr,
+        ROUND(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps),
+            3
+        ) AS future_price_current_pe,
+        ROUND(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps) / 2,
+            3
+        ) AS future_price_half_pe,
+        CAGR(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps),
+            latest_prices.close_price,
+            10
+        ) roi_current_pe,
+        CAGR(
+            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps) / 2,
+            latest_prices.close_price,
+            10
+        ) roi_halved_pe
+    FROM ten_year_old_stocks st
+        INNER JOIN stock_yearly_averages AS averages ON  averages.stock_id = st.stock_id
+        INNER JOIN latest_prices ON latest_prices.stock_id = st.stock_id AND latest_prices.rank = 1
+        INNER JOIN currencies ON currencies.stock_id = st.stock_id AND currencies.rank = 1
+        INNER JOIN per_share ON per_share.stock_id = st.stock_id
+        INNER JOIN company_profiles ON company_profiles.stock_id = st.stock_id
+    WHERE per_share.eps <> 0
 );
