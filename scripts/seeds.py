@@ -9,7 +9,7 @@ from research.db.config import db
 __author__ = "Francisco Soto"
 
 
-def init():
+def seed_db():
     # Import all available stocks.
     importer.stocks()
     # Get all fundamental data for these stocks.

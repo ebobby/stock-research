@@ -229,7 +229,7 @@ def _process_income_statements(stock, report_type, reports, logger):
         report_date = datetime.strptime(report["date"], DATE_FORMAT)
 
         # For some reason, this happens.
-        if report_date > date.today():
+        if report_date.date() > date.today():
             continue
 
         statement = (
@@ -303,7 +303,7 @@ def _process_balance_sheets(stock, report_type, reports, logger):
         report_date = datetime.strptime(report["date"], DATE_FORMAT)
 
         # For some reason, this happens.
-        if report_date > date.today():
+        if report_date.date() > date.today():
             continue
 
         sheet = (
@@ -406,7 +406,7 @@ def _process_cash_flow_statements(stock, report_type, reports, logger):
         report_date = datetime.strptime(report["date"], DATE_FORMAT)
 
         # For some reason, this happens.
-        if report_date > date.today():
+        if report_date.date() > date.today():
             continue
 
         statement = (
