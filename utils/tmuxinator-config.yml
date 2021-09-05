@@ -1,6 +1,6 @@
 # $HOME/.config/tmuxinator/stock-research.yml
 
-name: homeroom
+name: stock-research
 root: ~/Projects/stock-research/
 
 windows:
@@ -13,9 +13,11 @@ windows:
         - one:
             - source venv/bin/activate
             - clear
+            - db/console
         - two:
             - source venv/bin/activate
             - clear
+            - db/console
   - console:
       - source venv/bin/activate
       - clear
