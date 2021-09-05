@@ -201,7 +201,6 @@ def prices(day=date.today()):
         price = eod_data.get(stock.symbol_for_api)
 
         if not price:
-            logger.info(f"End-of-day price data not found for {stock.symbol_for_api}")
             continue
 
         daily_price.date = day
