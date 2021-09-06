@@ -310,24 +310,44 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     equity_per_share,
     has_errors
   FROM stock_general_report
---  ORDER BY symbol, type, date desc
 );
 
 DROP MATERIALIZED VIEW IF EXISTS stock_yearly_report;
 CREATE MATERIALIZED VIEW stock_yearly_report AS (
+    WITH years AS (
+        SELECT
+            *,
+            SUM(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_dividends_per_share,
+            SUM(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_eps
+        FROM stock_general_report_with_growth
+        WHERE report_number <= 10 AND type = 'Y' -- Only last ten years.
+    ),
+    prices AS (
+        SELECT
+            dp.stock_id,
+            y.date report_date,
+            dp.adjusted_close AS close_price,
+            dp.date AS price_date,
+            RANK() OVER (PARTITION BY y.stock_id, y.date ORDER BY dp.date ASC) AS rank
+        FROM years y
+            INNER JOIN daily_prices dp ON y.stock_id = dp.stock_id
+                                       AND dp.date BETWEEN y.date AND (y.date + interval '1 month')
+    )
     SELECT
-        *,
-        SUM(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_dividends_per_share,
-        SUM(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_eps
-    FROM stock_general_report_with_growth
-    WHERE report_number <= 10 AND type = 'Y' -- Only last ten years.
-  ORDER BY symbol, date asc
+        y.*,
+        CASE WHEN y.earnings_per_share <> 0 THEN ROUND(p.close_price / y.earnings_per_share, 3)
+        ELSE 'NAN'::decimal END AS pe_ratio,
+        p.close_price AS share_price,
+        p.price_date
+    FROM years y
+        LEFT OUTER JOIN prices p ON p.stock_id = y.stock_id AND y.date = p.report_date AND rank = 1
+    ORDER BY symbol, y.date asc
 );
 
 DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
 CREATE MATERIALIZED VIEW stock_yearly_averages AS (
     SELECT
-        stock_id,
+        stock_yearly_report.stock_id,
         symbol,
         company_name,
         market_capitalization,
@@ -350,6 +370,9 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
         ROUND(MEDIAN(return_on_equity), 3) median_return_on_equity,
         ROUND(AVG(dividends_rate), 3) avg_dividends_rate,
         ROUND(MEDIAN(dividends_rate), 3) median_dividends_rate,
+        ROUND(AVG(pe_ratios.pe_ratio)) AS avg_pe_ratio,
+        ROUND(MAX(pe_ratios.pe_ratio), 3) max_pe_ratio,
+        ROUND(MIN(pe_ratios.pe_ratio)) AS min_pe_ratio,
         ROUND(
             -REGR_SLOPE(
                 earnings::decimal,
@@ -359,7 +382,10 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
         COUNT(*) years,
         EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stock_yearly_report.stock_id LIMIT 1) AS has_errors
     FROM stock_yearly_report
-    GROUP BY stock_id, symbol, company_name, market_capitalization, sector, industry, currency
+        LEFT OUTER JOIN (
+            SELECT stock_id, pe_ratio FROM stock_yearly_report WHERE pe_ratio > 0
+        ) pe_ratios ON pe_ratios.stock_id = stock_yearly_report.stock_id
+    GROUP BY stock_yearly_report.stock_id, symbol, company_name, market_capitalization, sector, industry, currency
 );
 
 DROP MATERIALIZED VIEW IF EXISTS stock_buffettology;
@@ -387,10 +413,10 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
                PARTITION BY stock_id, symbol ORDER BY report_number
                RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
            ))::decimal prev_accum_eps,
-           (FIRST_VALUE(accum_dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal accum_dividends_per_share,
+           (FIRST_VALUE(accum_dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal accum_dividends,
            (FIRST_VALUE(accum_eps) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal accum_eps,
            (FIRST_VALUE(equity_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal equity_per_share,
-           (FIRST_VALUE(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal dividends_per_share,
+           (FIRST_VALUE(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal dividends,
            (FIRST_VALUE(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal eps,
            (NTH_VALUE(earnings_per_share, 5) OVER (
                PARTITION BY stock_id, symbol ORDER BY report_number
@@ -408,7 +434,8 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
            (NTH_VALUE(earnings, 10) OVER (
                PARTITION BY stock_id, symbol ORDER BY report_number
                RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-           ))::decimal earnings_10y
+           ))::decimal earnings_10y,
+           (FIRST_VALUE(date) OVER (PARTITION BY stock_id, symbol ORDER BY report_number)) last_report_date
         FROM stock_yearly_report
     ),
     currencies AS (
@@ -420,78 +447,67 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             RANK() OVER (PARTITION BY stock_id, report_type ORDER BY stock_id, report_type, report_date DESC) AS rank
         FROM income_statements
         WHERE report_type = 'Y'
+    ),
+    base AS (
+        SELECT
+            averages.stock_id,
+            averages.symbol,
+            averages.company_name,
+            averages.market_capitalization AS market_cap,
+            averages.sector,
+            averages.industry,
+            company_profiles.category,
+            currencies.currency,
+            averages.has_errors,
+            per_share.last_report_date,
+            averages.earnings_trend,
+            averages.median_earnings_growth,
+            averages.median_equity_growth,
+            averages.median_return_on_equity,
+            averages.median_dividends_rate,
+            per_share.equity_per_share,
+            per_share.dividends,
+            per_share.eps,
+            per_share.eps_5y,
+            per_share.eps_10y,
+            per_share.earnings,
+            per_share.earnings_5y,
+            per_share.earnings_10y,
+            CAGR(per_share.eps, per_share.eps_5y, 5) AS eps_cagr_5y,
+            CAGR(per_share.eps, per_share.eps_10y, 10) AS eps_cagr_10y,
+            CAGR(per_share.earnings, per_share.earnings_5y, 5) AS earnings_cagr_5y,
+            CAGR(per_share.earnings, per_share.earnings_10y, 10) AS earnings_cagr_10y,
+            per_share.accum_dividends,
+            per_share.accum_eps,
+            CASE
+              WHEN (per_share.prev_accum_eps - per_share.prev_accum_dividends) <> 0 THEN ROUND((per_share.eps - per_share.eps_10y) / (per_share.prev_accum_eps - per_share.prev_accum_dividends), 3)
+              ELSE 'NaN'::decimal END AS return_on_retained_earnings,
+            latest_prices.close_price AS last_price,
+            latest_prices.price_date,
+            ROUND(latest_prices.close_price / per_share.eps, 3) AS pe_ratio,
+            averages.avg_pe_ratio AS avg_pe_ratio,
+            averages.min_pe_ratio AS min_pe_ratio,
+            ROUND(per_share.eps / latest_prices.close_price, 3) rate_of_return
+        FROM ten_year_old_stocks st
+            INNER JOIN stock_yearly_averages AS averages ON  averages.stock_id = st.stock_id
+            INNER JOIN latest_prices ON latest_prices.stock_id = st.stock_id AND latest_prices.rank = 1
+            INNER JOIN currencies ON currencies.stock_id = st.stock_id AND currencies.rank = 1
+            INNER JOIN per_share ON per_share.stock_id = st.stock_id
+            INNER JOIN company_profiles ON company_profiles.stock_id = st.stock_id
+        WHERE per_share.eps <> 0
+    ),
+    estimations AS (
+        SELECT
+            base.*,
+            ROUND(base.eps * POWER(1 + base.eps_cagr_5y, 10), 3) AS estimated_eps_5y_cagr,
+            ROUND(base.eps * POWER(1 + base.eps_cagr_10y, 10), 3) AS estimated_eps_10y_cagr,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.median_return_on_equity, 3) AS estimated_equity_per_share,
+            ROUND((base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10)) / base.last_price, 3) AS estimated_rate_of_return,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.min_pe_ratio, 3) AS estimated_price_min_pe,
+            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.avg_pe_ratio, base.last_price, 10) AS roi_avg_pe,
+            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.min_pe_ratio, base.last_price, 10) AS roi_min_pe
+        FROM base
     )
-    SELECT
-        averages.stock_id,
-        averages.symbol,
-        averages.company_name,
-        averages.market_capitalization AS market_cap,
-        averages.sector,
-        averages.industry,
-        company_profiles.category,
-        currencies.currency,
-        averages.has_errors,
-        averages.earnings_trend,
-        averages.median_earnings_growth,
-        averages.median_equity_growth,
-        averages.median_return_on_equity,
-        averages.median_dividends_rate,
-        per_share.equity_per_share,
-        per_share.dividends_per_share,
-        per_share.eps,
-        per_share.eps_5y,
-        per_share.eps_10y,
-        per_share.earnings,
-        per_share.earnings_5y,
-        per_share.earnings_10y,
-        CAGR(per_share.eps, per_share.eps_5y, 5) AS eps_cagr_5y,
-        CAGR(per_share.eps, per_share.eps_10y, 10) AS eps_cagr_10y,
-        CAGR(per_share.earnings, per_share.earnings_5y, 5) AS earnings_cagr_5y,
-        CAGR(per_share.earnings, per_share.earnings_10y, 10) AS earnings_cagr_10y,
-        per_share.accum_dividends_per_share,
-        per_share.accum_eps,
-        CASE
-          WHEN (per_share.prev_accum_eps - per_share.prev_accum_dividends) <> 0 THEN ROUND((per_share.eps - per_share.eps_10y) / (per_share.prev_accum_eps - per_share.prev_accum_dividends), 3)
-          ELSE 'NaN'::decimal END AS return_on_retained_earnings,
-        latest_prices.close_price AS price,
-        ROUND(latest_prices.close_price / per_share.eps, 3) AS pe_ratio,
-        ROUND(latest_prices.close_price / per_share.eps / 2, 3) AS pe_ratio_over_two,
-        ROUND(per_share.eps / latest_prices.close_price, 3) irr,
-        ROUND(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10),
-            3
-        ) future_eps,
-        ROUND(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10),
-            3
-        ) future_equity_per_share,
-        ROUND(
-            (per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10)) / latest_prices.close_price,
-            3
-        ) AS future_rr,
-        ROUND(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps),
-            3
-        ) AS future_price_current_pe,
-        ROUND(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps) / 2,
-            3
-        ) AS future_price_half_pe,
-        CAGR(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps),
-            latest_prices.close_price,
-            10
-        ) roi_current_pe,
-        CAGR(
-            per_share.eps * POWER(1 + CAGR(per_share.eps, per_share.eps_10y, 10), 10) * (latest_prices.close_price / per_share.eps) / 2,
-            latest_prices.close_price,
-            10
-        ) roi_halved_pe
-    FROM ten_year_old_stocks st
-        INNER JOIN stock_yearly_averages AS averages ON  averages.stock_id = st.stock_id
-        INNER JOIN latest_prices ON latest_prices.stock_id = st.stock_id AND latest_prices.rank = 1
-        INNER JOIN currencies ON currencies.stock_id = st.stock_id AND currencies.rank = 1
-        INNER JOIN per_share ON per_share.stock_id = st.stock_id
-        INNER JOIN company_profiles ON company_profiles.stock_id = st.stock_id
-    WHERE per_share.eps <> 0
+    SELECT * FROM estimations
 );
