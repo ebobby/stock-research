@@ -499,8 +499,7 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
     estimations AS (
         SELECT
             base.*,
-            ROUND(base.eps * POWER(1 + base.eps_cagr_5y, 10), 3) AS estimated_eps_5y_cagr,
-            ROUND(base.eps * POWER(1 + base.eps_cagr_10y, 10), 3) AS estimated_eps_10y_cagr,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10), 3) AS estimated_eps,
             ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.median_return_on_equity, 3) AS estimated_equity_per_share,
             ROUND((base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10)) / base.last_price, 3) AS estimated_rate_of_return,
             ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
