@@ -13,11 +13,11 @@ windows:
         - one:
             - source venv/bin/activate
             - clear
-            - db/console
+            - bin/dbconsole
         - two:
             - source venv/bin/activate
             - clear
-            - db/console
+            - bin/dbconsole
   - console:
       - source venv/bin/activate
       - clear
