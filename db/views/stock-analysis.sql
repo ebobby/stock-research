@@ -453,6 +453,8 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             averages.stock_id,
             averages.symbol,
             averages.company_name,
+            company_profiles.url,
+            'https://finance.yahoo.com/quote/' || averages.symbol AS yahoo_url,
             averages.market_capitalization AS market_cap,
             averages.sector,
             averages.industry,
