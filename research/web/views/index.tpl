@@ -6,14 +6,16 @@
   <table class="table table-striped table-hover table-scroll">
     <thead>
       <tr>
+         <th>#</th>
 %   for col in list(rows[0].keys()):
          <th>{{col}}</th>
 %   end
       </tr>
     </thead>
     <tbody>
-%   for row in rows:
+%   for i, row in enumerate(rows):
       <tr>
+        <td>{{i+1}}</td>
 %     for key in row.keys():
 %       if key == 'symbol':
           <td><a href="/stock/{{row[key]}}" target="_blank">{{row[key]}}</a></td>
