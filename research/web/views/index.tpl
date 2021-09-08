@@ -1,4 +1,4 @@
-% rebase('layout.tpl', title='Analysis')
+% rebase('layout.tpl', title='Stock Analysis')
 
 % if len(rows) == 0:
   No data
@@ -8,7 +8,7 @@
       <tr>
          <th>#</th>
 %   for col in list(rows[0].keys()):
-         <th>{{col}}</th>
+         <th style="min-width: 120px">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
 %   end
       </tr>
     </thead>
@@ -19,6 +19,8 @@
 %     for key in row.keys():
 %       if key == 'symbol':
           <td><a href="/stock/{{row[key]}}" target="_blank">{{row[key]}}</a></td>
+%       elif key in ['return_on_investment','rate_of_return', 'cagr', 'return_on_retained_earnings', 'earnings_growth']:
+          <td>{{f"{round(float(row[key]) * 100.0, 2)}%"}}</td>
 %       elif key == 'url':
           <td><a href="{{row[key]}}" target="_blank">website</a></td>
 %       elif key == 'yahoo_url':

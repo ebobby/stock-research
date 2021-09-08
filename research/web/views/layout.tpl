@@ -13,7 +13,7 @@
     <div class="container" style="padding: 15px">
       <header class="nav">
         <div class="nav-center">
-          <h3>Stock Analysis</h3>
+          <h3>{{title}}</h3>
         </div>
       </header>
       {{!base}}
