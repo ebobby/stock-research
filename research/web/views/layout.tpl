@@ -9,13 +9,15 @@
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 <!--    <link rel="stylesheet" href="https://unpkg.com/chota@latest"> -->
   </head>
-  <body>
-    <div class="container" style="padding: 15px">
-      <header class="nav">
-        <div class="nav-center">
-          <h3>{{title}}</h3>
-        </div>
-      </header>
+  <body style="padding: 30px">
+    <header class="navbar">
+      <section class="navbar-section">&nbsp;</section>
+      <section class="navbar-center">
+        <h1>{{title}}</h1>
+      </section>
+      <section class="navbar-section">&nbsp;</section>
+    </header>
+    <div class="container">
       {{!base}}
     </div>
   </body>
