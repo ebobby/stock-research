@@ -1,4 +1,4 @@
-% if len(rows) == 0:
+% if len(rows) == 0 or not rows[0]:
   No data
 % else:
   <table class="table table-striped table-hover table-scroll">
