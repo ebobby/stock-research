@@ -1,6 +1,7 @@
-DROP MATERIALIZED VIEW IF EXISTS stock_buffettology;
-DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
-DROP MATERIALIZED VIEW IF EXISTS stock_yearly_report;
+DROP VIEW IF EXISTS stock_simple_analysis;
+DROP VIEW IF EXISTS stock_buffettology;
+DROP MATERIALIZED VIEW IF EXISTS stock_annual_averages;
+DROP MATERIALIZED VIEW IF EXISTS stock_annual_report;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report_with_growth;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report;
 DROP AGGREGATE median(anyelement);
@@ -48,7 +49,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION to_millions(amount DECIMAL) RETURNS DECIMAL AS $$
 BEGIN
-  RETURN ROUND(amount/1000000,6);
+  RETURN ROUND(amount/1000000,2);
 END;
 $$ LANGUAGE plpgsql;
 
@@ -312,8 +313,8 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
   FROM stock_general_report
 );
 
-DROP MATERIALIZED VIEW IF EXISTS stock_yearly_report;
-CREATE MATERIALIZED VIEW stock_yearly_report AS (
+DROP MATERIALIZED VIEW IF EXISTS stock_annual_report;
+CREATE MATERIALIZED VIEW stock_annual_report AS (
     WITH years AS (
         SELECT
             *,
@@ -344,10 +345,10 @@ CREATE MATERIALIZED VIEW stock_yearly_report AS (
     ORDER BY symbol, y.date asc
 );
 
-DROP MATERIALIZED VIEW IF EXISTS stock_yearly_averages;
-CREATE MATERIALIZED VIEW stock_yearly_averages AS (
+DROP MATERIALIZED VIEW IF EXISTS stock_annual_averages;
+CREATE MATERIALIZED VIEW stock_annual_averages AS (
     SELECT
-        stock_yearly_report.stock_id,
+        stock_annual_report.stock_id,
         symbol,
         company_name,
         market_capitalization,
@@ -380,18 +381,18 @@ CREATE MATERIALIZED VIEW stock_yearly_averages AS (
             )::decimal
         , 3) earnings_trend,
         COUNT(*) years,
-        EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stock_yearly_report.stock_id LIMIT 1) AS has_errors
-    FROM stock_yearly_report
+        EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stock_annual_report.stock_id LIMIT 1) AS has_errors
+    FROM stock_annual_report
         LEFT OUTER JOIN (
-            SELECT stock_id, pe_ratio FROM stock_yearly_report WHERE pe_ratio > 0
-        ) pe_ratios ON pe_ratios.stock_id = stock_yearly_report.stock_id
-    GROUP BY stock_yearly_report.stock_id, symbol, company_name, market_capitalization, sector, industry, currency
+            SELECT stock_id, pe_ratio FROM stock_annual_report WHERE pe_ratio > 0
+        ) pe_ratios ON pe_ratios.stock_id = stock_annual_report.stock_id
+    GROUP BY stock_annual_report.stock_id, symbol, company_name, market_capitalization, sector, industry, currency
 );
 
-DROP MATERIALIZED VIEW IF EXISTS stock_buffettology;
-CREATE MATERIALIZED VIEW stock_buffettology AS (
+DROP VIEW IF EXISTS stock_buffettology;
+CREATE VIEW stock_buffettology AS (
     WITH ten_year_old_stocks AS (
-      SELECT stock_id FROM stock_yearly_report WHERE report_number = 10
+      SELECT stock_id FROM stock_annual_report WHERE report_number = 10
     ),
     latest_prices AS (
         SELECT
@@ -418,6 +419,10 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
            (FIRST_VALUE(equity_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal equity_per_share,
            (FIRST_VALUE(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal dividends,
            (FIRST_VALUE(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY report_number))::decimal eps,
+           (NTH_VALUE(earnings_per_share, 2) OVER (
+               PARTITION BY stock_id, symbol ORDER BY report_number
+               RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+           ))::decimal eps_1y,
            (NTH_VALUE(earnings_per_share, 5) OVER (
                PARTITION BY stock_id, symbol ORDER BY report_number
                RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
@@ -436,7 +441,7 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
                RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
            ))::decimal earnings_10y,
            (FIRST_VALUE(date) OVER (PARTITION BY stock_id, symbol ORDER BY report_number)) last_report_date
-        FROM stock_yearly_report
+        FROM stock_annual_report
     ),
     currencies AS (
         SELECT
@@ -453,6 +458,8 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             averages.stock_id,
             averages.symbol,
             averages.company_name,
+            company_profiles.url,
+            'https://finance.yahoo.com/quote/' || averages.symbol AS yahoo_url,
             averages.market_capitalization AS market_cap,
             averages.sector,
             averages.industry,
@@ -468,6 +475,7 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             per_share.equity_per_share,
             per_share.dividends,
             per_share.eps,
+            per_share.eps_1y,
             per_share.eps_5y,
             per_share.eps_10y,
             per_share.earnings,
@@ -475,6 +483,7 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             per_share.earnings_10y,
             CAGR(per_share.eps, per_share.eps_5y, 5) AS eps_cagr_5y,
             CAGR(per_share.eps, per_share.eps_10y, 10) AS eps_cagr_10y,
+            CAGR(per_share.eps_1y, per_share.eps_10y, 9) AS eps_cagr_9y,
             CAGR(per_share.earnings, per_share.earnings_5y, 5) AS earnings_cagr_5y,
             CAGR(per_share.earnings, per_share.earnings_10y, 10) AS earnings_cagr_10y,
             per_share.accum_dividends,
@@ -489,7 +498,7 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
             averages.min_pe_ratio AS min_pe_ratio,
             ROUND(per_share.eps / latest_prices.close_price, 3) rate_of_return
         FROM ten_year_old_stocks st
-            INNER JOIN stock_yearly_averages AS averages ON  averages.stock_id = st.stock_id
+            INNER JOIN stock_annual_averages AS averages ON  averages.stock_id = st.stock_id
             INNER JOIN latest_prices ON latest_prices.stock_id = st.stock_id AND latest_prices.rank = 1
             INNER JOIN currencies ON currencies.stock_id = st.stock_id AND currencies.rank = 1
             INNER JOIN per_share ON per_share.stock_id = st.stock_id
@@ -499,14 +508,50 @@ CREATE MATERIALIZED VIEW stock_buffettology AS (
     estimations AS (
         SELECT
             base.*,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10), 3) AS estimated_eps,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.median_return_on_equity, 3) AS estimated_equity_per_share,
-            ROUND((base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10)) / base.last_price, 3) AS estimated_rate_of_return,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.min_pe_ratio, 3) AS estimated_price_min_pe,
-            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.avg_pe_ratio, base.last_price, 10) AS roi_avg_pe,
-            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y), 10) * base.min_pe_ratio, base.last_price, 10) AS roi_min_pe
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10), 3) AS estimated_eps,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.median_return_on_equity, 3) AS estimated_equity_per_share,
+            ROUND((base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10)) / base.last_price, 3) AS estimated_rate_of_return,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
+            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.min_pe_ratio, 3) AS estimated_price_min_pe,
+            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.avg_pe_ratio, base.last_price, 10) AS roi_avg_pe,
+            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.min_pe_ratio, base.last_price, 10) AS roi_min_pe
         FROM base
     )
     SELECT * FROM estimations
+);
+
+DROP VIEW IF EXISTS stock_simple_analysis;
+CREATE VIEW stock_simple_analysis AS (
+    SELECT
+        symbol,
+        company_name company,
+        industry,
+        last_report_date reported_date,
+        roi_min_pe return_on_investment,
+        return_on_retained_earnings,
+        TO_CHAR(eps, 'L999G999D99') eps,
+        TO_CHAR(eps_1y, 'L999G999D999') eps_1y,
+        TO_CHAR(eps_5y, 'L999G999D999') eps_5y,
+        TO_CHAR(eps_10y, 'L999G999D999') eps_10y,
+        TO_CHAR(last_price, 'L999G999D999') share_price,
+        rate_of_return,
+        LEAST(eps_cagr_10y, eps_cagr_5y) cagr,
+        eps_cagr_9y validation_cagr,
+        ROUND(LEAST(eps_cagr_10y, eps_cagr_5y) / eps_cagr_9y, 2) validation,
+        median_earnings_growth earnings_growth,
+        TO_CHAR(estimated_eps, 'L999G999D999') estimated_eps,
+        estimated_rate_of_return,
+        TO_CHAR(estimated_price_min_pe, 'L999G999D999') estimated_price
+    FROM stock_buffettology
+    WHERE earnings_trend > 0
+      AND eps_cagr_10y > 0
+      AND eps_cagr_10y <> 'NAN'::decimal
+      AND eps_cagr_5y > 0
+      AND eps_cagr_5y <> 'NAN'::decimal
+      AND has_errors = 'f'
+      AND currency = 'USD'
+      AND category ILIKE '%domestic%'
+      AND median_return_on_equity > 0
+      AND median_equity_growth > 0
+      AND median_earnings_growth > 0
 );

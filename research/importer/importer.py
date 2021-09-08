@@ -28,10 +28,17 @@ logging.basicConfig(
 
 __author__ = "Francisco Soto"
 
-__all__ = ["stocks", "fundamentals", "prices"]
+__all__ = ["daily", "stocks", "fundamentals", "prices"]
 
 
 DATE_FORMAT = "%Y-%m-%d"
+
+
+def daily():
+    """Daily import."""
+    stocks()
+    fundamentals()
+    prices()
 
 
 def stocks():
@@ -92,7 +99,7 @@ def fundamentals():
     report_time = datetime.timestamp(datetime.now())
     processed = 0
 
-    for stock in stocks:
+    for i, stock in enumerate(stocks):
         if _needs_fundamentals(stock):
             # Remove all errors, we're gonna process everything again anyway.
             stock.errors().delete()
@@ -146,7 +153,7 @@ def fundamentals():
 
         # Report current progress
         if datetime.timestamp(datetime.now()) - report_time >= 60:
-            logger.info(f"{processed} stocks processed.")
+            logger.info(f"{i}/{len(stocks)} : {processed} stocks processed.")
             report_time = datetime.timestamp(datetime.now())
 
     logger.info(f"Fundamentals sync finished, {processed} stocks processed.")
