@@ -19,7 +19,7 @@
 %     for key in row.keys():
 %       if key == 'symbol':
           <td><a href="/stock/{{row[key]}}" target="_blank">{{row[key]}}</a></td>
-%       elif key in ['return_on_investment','rate_of_return', 'cagr', 'return_on_retained_earnings', 'earnings_growth']:
+%       elif key in ['return_on_investment','rate_of_return', 'cagr', 'return_on_retained_earnings', 'earnings_growth', 'validation_cagr']:
           <td>{{f"{round(float(row[key]) * 100.0, 2)}%"}}</td>
 %       elif key == 'url':
           <td><a href="{{row[key]}}" target="_blank">website</a></td>
