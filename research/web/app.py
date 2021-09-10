@@ -15,12 +15,11 @@ app = Bottle()
 def index():
     rows = (
         db.table("stock_simple_analysis")
-        .where("return_on_investment", ">=", 0.15)
-        .where("return_on_retained_earnings", ">=", 0.20)
-        .where("validation", "<", 1.50)
-        .where("validation", ">", 0.0)
-        .order_by("return_on_investment", "DESC")
-        .get()
+        #        .where("return_on_investment", ">=", 0.15)
+        #        .where("return_on_retained_earnings", ">=", 0.20)
+        #        .where("validation", "<", 1.50)
+        #        .where("validation", ">", 0.0)
+        .order_by("return_on_investment", "DESC").get()
     )
     return template("index", rows=rows)
 
