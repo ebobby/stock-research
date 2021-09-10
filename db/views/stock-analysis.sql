@@ -509,10 +509,10 @@ CREATE VIEW stock_buffettology AS (
         SELECT
             base.symbol,
             base.eps *
-                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 3) +
-                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.75, 3) +
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 3) *
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.75, 3) *
                 POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.50, 4) AS estimated_eps
-        FROM base
+         FROM base
     ),
     results AS (
         SELECT
