@@ -106,6 +106,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       ROUND(CASE WHEN gross_profit <> 0
             THEN research_and_development / gross_profit
             ELSE 0 END, 4) AS rd_to_profit,
+      to_millions(depreciation_and_amortization) AS depreciation,
       ROUND(CASE WHEN gross_profit <> 0
             THEN depreciation_and_amortization / gross_profit
             ELSE 0 END, 4) AS depreciation_to_profit,
@@ -176,7 +177,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       to_millions(total_cash_from_investing_activities) AS cash_from_investing_activities,
       to_millions(total_cash_from_financing_activities) AS cash_from_financing_activities,
       to_millions(cash_flow_statements.capital_expenditures) AS capital_expenditures,
-      to_millions(free_cash_flow) AS free_cash_flow,
+      to_millions(free_cash_flow) AS reported_cash_flow,
       ROUND(CASE WHEN income_statements.net_earnings <> 0
             THEN cash_flow_statements.capital_expenditures / income_statements.net_earnings
             ELSE 0 END, 4) AS capital_expenditures_to_earnings,
@@ -185,6 +186,7 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       ROUND(CASE WHEN income_statements.net_earnings <> 0
             THEN -dividends_paid / income_statements.net_earnings
             ELSE 0 END, 4) AS dividends_rate,
+      to_millions(net_earnings - capital_expenditures + depreciation_and_amortization) AS cash_flow,
       -- per share
       common_stock_shares_outstanding::bigint AS shares_outstanding,
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
@@ -202,6 +204,9 @@ CREATE MATERIALIZED VIEW stock_general_report AS
       ROUND(CASE WHEN common_stock_shares_outstanding <> 0
             THEN total_stockholder_equity / common_stock_shares_outstanding
             ELSE 0 END, 4) AS equity_per_share,
+      ROUND(CASE WHEN common_stock_shares_outstanding <> 0
+            THEN (net_earnings - capital_expenditures + depreciation_and_amortization) / common_stock_shares_outstanding
+            ELSE 0 END, 4) AS cash_flow_per_share,
       EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stocks.id LIMIT 1) AS has_errors
     FROM stocks
         INNER JOIN company_profiles ON stocks.id = company_profiles.stock_id
@@ -242,6 +247,7 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     profit_margin,
     sga_to_profit,
     rd_to_profit,
+    depreciation,
     depreciation_to_profit,
     operating_income,
     operating_margin,
@@ -295,20 +301,25 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     CASE WHEN report_number <> 10
     THEN growth(capital_expenditures, LAG(capital_expenditures) OVER (ORDER BY symbol, type, date))
     ELSE 0 END AS capital_expenditures_growth,
-    free_cash_flow,
+    reported_cash_flow,
     CASE WHEN report_number <> 10
-    THEN growth(free_cash_flow, LAG(free_cash_flow) OVER (ORDER BY symbol, type, date))
-    ELSE 0 END AS free_cash_flow_growth,
+    THEN growth(reported_cash_flow, LAG(reported_cash_flow) OVER (ORDER BY symbol, type, date))
+    ELSE 0 END AS reported_cash_flow_growth,
     capital_expenditures_to_earnings,
     stock_issuance,
     dividends_paid,
     dividends_rate,
+    cash_flow,
+    CASE WHEN report_number <> 10
+    THEN growth(cash_flow, LAG(cash_flow) OVER (ORDER BY symbol, type, date))
+    ELSE 0 END AS cash_flow_growth,
     shares_outstanding,
     revenue_per_share,
     earnings_per_share,
     dividends_per_share,
     cash_per_share,
     equity_per_share,
+    cash_flow_per_share,
     has_errors
   FROM stock_general_report
 );
@@ -338,6 +349,8 @@ CREATE MATERIALIZED VIEW stock_annual_report AS (
         y.*,
         CASE WHEN y.earnings_per_share <> 0 THEN ROUND(p.close_price / y.earnings_per_share, 3)
         ELSE 'NAN'::decimal END AS pe_ratio,
+        CASE WHEN y.cash_flow_per_share <> 0 THEN ROUND(p.close_price / y.cash_flow_per_share, 3)
+        ELSE 'NAN'::decimal END AS price_cf_ratio,
         p.close_price AS share_price,
         p.price_date
     FROM years y
@@ -362,7 +375,6 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         ROUND(AVG(equity_growth), 3) avg_equity_growth,
         ROUND(MEDIAN(equity_growth), 3) median_equity_growth,
         ROUND(AVG(profit_margin), 3) avg_profit_margin,
-        ROUND(AVG(free_cash_flow_growth), 3) avg_free_cash_flow_growth,
         ROUND(AVG(return_on_assets), 3) avg_return_on_assets,
         ROUND(MEDIAN(return_on_assets), 3) median_return_on_assets,
         ROUND(AVG(return_on_capital), 3) avg_return_on_capital,
@@ -371,9 +383,13 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         ROUND(MEDIAN(return_on_equity), 3) median_return_on_equity,
         ROUND(AVG(dividends_rate), 3) avg_dividends_rate,
         ROUND(MEDIAN(dividends_rate), 3) median_dividends_rate,
+        ROUND(AVG(cash_flow_growth), 3) avg_cash_flow_growth,
+        ROUND(MEDIAN(cash_flow_growth), 3) median_cash_flow_growth,
         ROUND(AVG(pe_ratios.pe_ratio)) AS avg_pe_ratio,
         ROUND(MAX(pe_ratios.pe_ratio), 3) max_pe_ratio,
         ROUND(MIN(pe_ratios.pe_ratio)) AS min_pe_ratio,
+        ROUND(AVG(price_cf_ratio)) AS avg_price_cf_ratio,
+        ROUND(MEDIAN(price_cf_ratio)) AS median_price_cf_ratio,
         ROUND(
             -REGR_SLOPE(
                 earnings::decimal,
@@ -537,7 +553,7 @@ CREATE VIEW stock_simple_analysis AS (
         company_name company,
         industry,
         last_report_date reported_date,
-        roi_min_pe return_on_investment,
+        roi_min_pe annual_return,
         return_on_retained_earnings,
         eps,
         eps_1y,
