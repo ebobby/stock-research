@@ -507,17 +507,27 @@ CREATE VIEW stock_buffettology AS (
     ),
     estimations AS (
         SELECT
-            base.*,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10), 3) AS estimated_eps,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.median_return_on_equity, 3) AS estimated_equity_per_share,
-            ROUND((base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10)) / base.last_price, 3) AS estimated_rate_of_return,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
-            ROUND(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.min_pe_ratio, 3) AS estimated_price_min_pe,
-            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.avg_pe_ratio, base.last_price, 10) AS roi_avg_pe,
-            CAGR(base.eps * POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 10) * base.min_pe_ratio, base.last_price, 10) AS roi_min_pe
+            base.symbol,
+            base.eps *
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 3) +
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.75, 3) +
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.50, 4) AS estimated_eps
         FROM base
+    ),
+    results AS (
+        SELECT
+            base.*,
+            ROUND(estimations.estimated_eps, 3) estimated_eps,
+            ROUND(estimations.estimated_eps * base.median_return_on_equity, 3) AS estimated_equity_per_share,
+            ROUND(estimations.estimated_eps / base.last_price, 3) AS estimated_rate_of_return,
+            ROUND(estimations.estimated_eps * base.avg_pe_ratio, 3) AS estimated_price_avg_pe,
+            ROUND(estimations.estimated_eps * base.min_pe_ratio, 3) AS estimated_price_min_pe,
+            CAGR(estimations.estimated_eps * base.avg_pe_ratio, base.last_price, 10) AS roi_avg_pe,
+            CAGR(estimations.estimated_eps * base.min_pe_ratio, base.last_price, 10) AS roi_min_pe
+        FROM base
+            INNER JOIN estimations on estimations.symbol = base.symbol
     )
-    SELECT * FROM estimations
+    SELECT * FROM results
 );
 
 DROP VIEW IF EXISTS stock_simple_analysis;
@@ -529,19 +539,22 @@ CREATE VIEW stock_simple_analysis AS (
         last_report_date reported_date,
         roi_min_pe return_on_investment,
         return_on_retained_earnings,
-        TO_CHAR(eps, 'L999G999D99') eps,
-        TO_CHAR(eps_1y, 'L999G999D999') eps_1y,
-        TO_CHAR(eps_5y, 'L999G999D999') eps_5y,
-        TO_CHAR(eps_10y, 'L999G999D999') eps_10y,
-        TO_CHAR(last_price, 'L999G999D999') share_price,
+        eps,
+        eps_1y,
+        eps_5y,
+        eps_10y,
+        last_price AS share_price,
         rate_of_return,
         LEAST(eps_cagr_10y, eps_cagr_5y) cagr,
         eps_cagr_9y validation_cagr,
         ROUND(LEAST(eps_cagr_10y, eps_cagr_5y) / eps_cagr_9y, 2) validation,
         median_earnings_growth earnings_growth,
-        TO_CHAR(estimated_eps, 'L999G999D999') estimated_eps,
+        pe_ratio,
+        avg_pe_ratio,
+        min_pe_ratio,
+        estimated_eps,
         estimated_rate_of_return,
-        TO_CHAR(estimated_price_min_pe, 'L999G999D999') estimated_price
+        estimated_price_min_pe AS estimated_price
     FROM stock_buffettology
     WHERE earnings_trend > 0
       AND eps_cagr_10y > 0
@@ -554,4 +567,5 @@ CREATE VIEW stock_simple_analysis AS (
       AND median_return_on_equity > 0
       AND median_equity_growth > 0
       AND median_earnings_growth > 0
+      AND return_on_retained_earnings > 0
 );
