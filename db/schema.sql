@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
--- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
+-- Dumped from database version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
+-- Dumped by pg_dump version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -238,6 +238,42 @@ ALTER SEQUENCE public.daily_prices_id_seq OWNED BY public.daily_prices.id;
 
 
 --
+-- Name: discounted_cash_flows; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.discounted_cash_flows (
+    id bigint NOT NULL,
+    stock_id integer NOT NULL,
+    last_date date NOT NULL,
+    symbol text NOT NULL,
+    discount_rate numeric(20,5) NOT NULL,
+    discounted_cash_flows numeric(20,5) NOT NULL,
+    discounteed_share_price numeric(20,5) NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+);
+
+
+--
+-- Name: discounted_cash_flows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.discounted_cash_flows_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: discounted_cash_flows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.discounted_cash_flows_id_seq OWNED BY public.discounted_cash_flows.id;
+
+
+--
 -- Name: errors; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -466,6 +502,13 @@ ALTER TABLE ONLY public.daily_prices ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: discounted_cash_flows id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discounted_cash_flows ALTER COLUMN id SET DEFAULT nextval('public.discounted_cash_flows_id_seq'::regclass);
+
+
+--
 -- Name: errors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -555,6 +598,22 @@ ALTER TABLE ONLY public.daily_prices
 
 ALTER TABLE ONLY public.daily_prices
     ADD CONSTRAINT daily_prices_stock_id_date_unique UNIQUE (stock_id, date);
+
+
+--
+-- Name: discounted_cash_flows discounted_cash_flows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discounted_cash_flows
+    ADD CONSTRAINT discounted_cash_flows_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: discounted_cash_flows discounted_cash_flows_stock_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discounted_cash_flows
+    ADD CONSTRAINT discounted_cash_flows_stock_id_unique UNIQUE (stock_id);
 
 
 --
@@ -660,6 +719,14 @@ ALTER TABLE ONLY public.daily_prices
 
 
 --
+-- Name: discounted_cash_flows discounted_cash_flows_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.discounted_cash_flows
+    ADD CONSTRAINT discounted_cash_flows_stock_id_foreign FOREIGN KEY (stock_id) REFERENCES public.stocks(id);
+
+
+--
 -- Name: errors errors_stock_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -691,8 +758,8 @@ ALTER TABLE ONLY public.statistics
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
--- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.10.1)
+-- Dumped from database version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
+-- Dumped by pg_dump version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -717,6 +784,7 @@ INSERT INTO public.migrations VALUES ('2021_05_22_023340_create_cash_flow_statem
 INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table', 4);
 INSERT INTO public.migrations VALUES ('2021_05_27_210259_create_table_data_errors', 5);
 INSERT INTO public.migrations VALUES ('2021_06_03_044026_create_statistics_table', 6);
+INSERT INTO public.migrations VALUES ('2021_09_13_050445_stock_discounted_cash_flows', 7);
 
 
 --

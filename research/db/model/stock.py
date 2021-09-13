@@ -16,6 +16,12 @@ class Stock(Model):
 
         return DailyPrice
 
+    @has_one
+    def discounted_cash_flow(self):
+        from .discounted_cash_flow import DiscountedCashFlow
+
+        return DiscountedCashFlow
+
     @has_many
     def errors(self):
         from .error import Error
