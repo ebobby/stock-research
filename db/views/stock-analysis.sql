@@ -349,8 +349,6 @@ CREATE MATERIALIZED VIEW stock_annual_report AS (
         y.*,
         CASE WHEN y.earnings_per_share <> 0 THEN ROUND(p.close_price / y.earnings_per_share, 3)
         ELSE 'NAN'::decimal END AS pe_ratio,
-        CASE WHEN y.cash_flow_per_share <> 0 THEN ROUND(p.close_price / y.cash_flow_per_share, 3)
-        ELSE 'NAN'::decimal END AS price_cf_ratio,
         p.close_price AS share_price,
         p.price_date
     FROM years y
@@ -368,6 +366,7 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         sector,
         industry,
         currency,
+        MAX(date) last_report_date,
         ROUND(AVG(revenue_growth), 3) avg_revenue_growth,
         ROUND(MEDIAN(revenue_growth), 3) median_revenue_growth,
         ROUND(AVG(earnings_growth), 3) avg_earnings_growth,
@@ -388,8 +387,6 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         ROUND(AVG(pe_ratios.pe_ratio)) AS avg_pe_ratio,
         ROUND(MAX(pe_ratios.pe_ratio), 3) max_pe_ratio,
         ROUND(MIN(pe_ratios.pe_ratio)) AS min_pe_ratio,
-        ROUND(AVG(price_cf_ratio)) AS avg_price_cf_ratio,
-        ROUND(MEDIAN(price_cf_ratio)) AS median_price_cf_ratio,
         ROUND(
             -REGR_SLOPE(
                 earnings::decimal,
@@ -526,8 +523,8 @@ CREATE VIEW stock_buffettology AS (
             base.symbol,
             base.eps *
                 POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y), 3) *
-                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.75, 3) *
-                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.50, 4) AS estimated_eps
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.75, 2) *
+                POWER(1 + LEAST(base.eps_cagr_10y, base.eps_cagr_5y, base.eps_cagr_9y) * 0.50, 5) AS estimated_eps
          FROM base
     ),
     results AS (
