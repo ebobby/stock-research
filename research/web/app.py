@@ -3,7 +3,6 @@ import os
 from bottle import TEMPLATE_PATH, Bottle, run, template
 
 from ..db.config import db
-from ..db.model import Stock
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 TEMPLATE_PATH.append(os.path.join(dir_path, "views"))
