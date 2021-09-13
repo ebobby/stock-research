@@ -39,6 +39,7 @@ def daily():
     stocks()
     fundamentals()
     prices()
+    refresh_views()
 
 
 def stocks():
@@ -670,3 +671,13 @@ def _needs_fundamentals(stock):
     result |= not last_quarter or (date.today() - last_quarter.report_date).days > 90
 
     return result
+
+
+def refresh_views():
+    """Refresh materialized views."""
+    db.connection().statement("REFRESH MATERIALIZED VIEW stock_general_report")
+    db.connection().statement(
+        "REFRESH MATERIALIZED VIEW stock_general_report_with_growth"
+    )
+    db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_report")
+    db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_averages")
