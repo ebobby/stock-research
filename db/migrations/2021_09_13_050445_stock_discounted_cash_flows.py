@@ -12,8 +12,8 @@ class StockDiscountedCashFlows(Migration):
             table.date("last_date")
             table.text("symbol")
             table.decimal("discount_rate", 20, 5)
-            table.decimal("discounted_cash_flows", 20, 5)
-            table.decimal("discounteed_share_price", 20, 5)
+            table.decimal("discounted_cash_flows", 25, 5)
+            table.decimal("discounted_share_price", 20, 5)
 
             # Timestamps
             table.timestamps()

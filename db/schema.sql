@@ -247,8 +247,8 @@ CREATE TABLE public.discounted_cash_flows (
     last_date date NOT NULL,
     symbol text NOT NULL,
     discount_rate numeric(20,5) NOT NULL,
-    discounted_cash_flows numeric(20,5) NOT NULL,
-    discounteed_share_price numeric(20,5) NOT NULL,
+    discounted_cash_flows numeric(25,5) NOT NULL,
+    discounted_share_price numeric(20,5) NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
     updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
 );
