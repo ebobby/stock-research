@@ -546,18 +546,20 @@ CREATE VIEW stock_buffettology AS (
 DROP VIEW IF EXISTS stock_simple_analysis;
 CREATE VIEW stock_simple_analysis AS (
     SELECT
-        symbol,
+        sb.symbol,
         company_name company,
         industry,
         last_report_date reported_date,
         roi_min_pe annual_return,
-        return_on_retained_earnings,
+        last_price AS share_price,
+        dcf.discounted_share_price AS dcf_price,
+        ROUND((dcf.discounted_share_price / last_price) - 1, 3) AS margin,
         eps,
         eps_1y,
         eps_5y,
         eps_10y,
-        last_price AS share_price,
         rate_of_return,
+        return_on_retained_earnings,
         LEAST(eps_cagr_10y, eps_cagr_5y, eps_cagr_9y) cagr,
         ROUND(LEAST(eps_cagr_10y, eps_cagr_5y) / eps_cagr_9y, 2) validation,
         median_earnings_growth earnings_growth,
@@ -567,7 +569,9 @@ CREATE VIEW stock_simple_analysis AS (
         estimated_eps,
         estimated_rate_of_return,
         estimated_price_min_pe AS estimated_price
-    FROM stock_buffettology
+    FROM stock_buffettology sb
+        LEFT OUTER JOIN discounted_cash_flows dcf ON
+             dcf.stock_id = sb.stock_id
     WHERE earnings_trend > 0
       AND eps_cagr_10y > 0
       AND eps_cagr_10y <> 'NAN'::decimal
