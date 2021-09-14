@@ -1,6 +1,6 @@
 import os
 
-from bottle import TEMPLATE_PATH, Bottle, run, template
+from bottle import TEMPLATE_PATH, Bottle, request, run, template
 
 from ..db.config import db
 
@@ -12,9 +12,13 @@ app = Bottle()
 
 @app.route("/")
 def index():
+    annual_return = (
+        request.query["annual_return"] if "annual_return" in request.query else 0.15
+    )
+
     rows = (
         db.table("stock_simple_analysis")
-        .where("annual_return", ">=", 0.15)
+        .where("annual_return", ">=", float(annual_return))
         .where("validation", "<", 1.50)
         .where("validation", ">", 0.0)
         .order_by("annual_return", "DESC")
