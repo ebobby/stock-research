@@ -2,6 +2,7 @@
 """API stock fundamental data importer."""
 
 import logging
+import math
 import sys
 from datetime import date, datetime
 
@@ -15,6 +16,7 @@ from research.db.model import (
     IncomeStatement,
     Statistics,
     Stock,
+    DiscountedCashFlow,
 )
 from research.utils import parse
 
@@ -40,6 +42,7 @@ def daily():
     fundamentals()
     prices()
     refresh_views()
+    discounted_cash_flows()
 
 
 def stocks():
@@ -675,9 +678,86 @@ def _needs_fundamentals(stock):
 
 def refresh_views():
     """Refresh materialized views."""
+
+    logger = logging.getLogger("materialized views")
+    logger.info("Refreshing database views")
+
     db.connection().statement("REFRESH MATERIALIZED VIEW stock_general_report")
     db.connection().statement(
         "REFRESH MATERIALIZED VIEW stock_general_report_with_growth"
     )
     db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_report")
     db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_averages")
+
+    logger.info("Finished refreshing database views")
+
+
+def discounted_cash_flows():
+    DISCOUNT_RATE = 0.15
+    PERPETUAL_GROWTH = 0.03
+
+    rows = (
+        db.table("stock_buffettology")
+        .select(
+            "stock_annual_report.stock_id",
+            "stock_annual_report.symbol",
+            "stock_annual_report.cash_flow",
+            "stock_annual_report.shares_outstanding",
+            "stock_annual_report.date",
+        )
+        .select_raw(
+            "LEAST(stock_buffettology.eps_cagr_10y, stock_buffettology.eps_cagr_5y, stock_buffettology.eps_cagr_9y) cagr"
+        )
+        .join(
+            "stock_annual_report",
+            "stock_annual_report.stock_id",
+            "=",
+            "stock_buffettology.stock_id",
+        )
+        .where("stock_annual_report.has_errors", "=", "f")
+        .where("stock_annual_report.shares_outstanding", "<>", 0)
+        .where("stock_annual_report.report_number", "=", 1)
+        .get()
+    )
+
+    logger = logging.getLogger("stock discounted cash flows")
+
+    logger.info("Generating stock discounted cash flows")
+
+    saved = 0
+    for row in rows:
+        dcf = (
+            DiscountedCashFlow.where("stock_id", row["stock_id"]).first()
+            or DiscountedCashFlow()
+        )
+
+        cash_flow = float(row["cash_flow"]) * 1000000
+        growth = float(row["cagr"])
+
+        accum = 0
+        current_cf = cash_flow
+        for i, mult in enumerate(
+            [growth] * 3 + [growth * 0.75] * 2 + [growth * 0.5] * 5
+        ):
+            current_cf = current_cf * (1.0 + mult)
+            accum += current_cf / math.pow(1 + DISCOUNT_RATE, i + 1)
+
+        accum += (
+            current_cf
+            / (DISCOUNT_RATE - PERPETUAL_GROWTH)
+            / math.pow(1 + DISCOUNT_RATE, i + 1)
+        )
+
+        discounted_share_price = accum / float(row["shares_outstanding"])
+
+        dcf.stock_id = row["stock_id"]
+        dcf.symbol = row["symbol"]
+        dcf.last_date = row["date"]
+        dcf.discount_rate = DISCOUNT_RATE
+        dcf.discounted_cash_flows = round(accum, 3)
+        dcf.discounted_share_price = round(discounted_share_price, 3)
+
+        dcf.save()
+        saved += 1
+
+    logger.info(f"Stock discounted cash flows finished, saved={saved}")
