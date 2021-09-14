@@ -384,9 +384,9 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         ROUND(MEDIAN(dividends_rate), 3) median_dividends_rate,
         ROUND(AVG(cash_flow_growth), 3) avg_cash_flow_growth,
         ROUND(MEDIAN(cash_flow_growth), 3) median_cash_flow_growth,
-        ROUND(AVG(pe_ratios.pe_ratio)) AS avg_pe_ratio,
-        ROUND(MAX(pe_ratios.pe_ratio), 3) max_pe_ratio,
-        ROUND(MIN(pe_ratios.pe_ratio)) AS min_pe_ratio,
+        ROUND(AVG(pe_ratio) FILTER (WHERE pe_ratio >= 0), 3) AS avg_pe_ratio,
+        ROUND(MAX(pe_ratio) FILTER (WHERE pe_ratio >= 0), 3) max_pe_ratio,
+        ROUND(MIN(pe_ratio) FILTER (WHERE pe_ratio >= 0), 3) AS min_pe_ratio,
         ROUND(
             -REGR_SLOPE(
                 earnings::decimal,
@@ -396,9 +396,6 @@ CREATE MATERIALIZED VIEW stock_annual_averages AS (
         COUNT(*) years,
         EXISTS(SELECT 1 FROM errors WHERE errors.stock_id = stock_annual_report.stock_id LIMIT 1) AS has_errors
     FROM stock_annual_report
-        LEFT OUTER JOIN (
-            SELECT stock_id, pe_ratio FROM stock_annual_report WHERE pe_ratio > 0
-        ) pe_ratios ON pe_ratios.stock_id = stock_annual_report.stock_id
     GROUP BY stock_annual_report.stock_id, symbol, company_name, market_capitalization, sector, industry, currency
 );
 
