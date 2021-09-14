@@ -1,7 +1,9 @@
+% scroll = scroll if "scroll" in vars() else True
+
 % if len(rows) == 0 or not rows[0]:
   No data
 % else:
-<div class="table-responsive">
+<div class="{{'table-responsive' if scroll else ''}}">
   <table class="table table-striped">
     <thead>
       <tr>
@@ -9,10 +11,12 @@
 %   for col in list(rows[0].keys()):
 %     if col == 'logo_url':
          <th scope="col">Logo</th>
+%     elif col in ['date', 'last_date', 'price_date']:
+         <th scope="col" style="min-width: 100px">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
 %     elif col in ['company', 'industry', 'sector', 'company_name']:
-         <th scope="col" style="min-width: 300px">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
+         <th scope="col" style="min-width: 200px">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
 %     else:
-         <th scope="col" style="min-width: 120px; overflow:hidden; white-space: nowrap;">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
+         <th scope="col" style="overflow:hidden; white-space: nowrap;">{{' '.join(w.capitalize() for w in col.split('_'))}}</th>
 %     end
 %   end
       </tr>
@@ -26,6 +30,8 @@
           <td><a href="/stock/{{row[key]}}" target="_blank">{{row[key]}}</a></td>
 %       elif key == 'url':
           <td><a href="{{row[key]}}" target="_blank">website</a></td>
+%       elif key in ['company', 'industry', 'sector', 'company_name']:
+          <td style="overflow:hidden; white-space: nowrap;">{{row[key]}}</td>
 %       elif key == 'logo_url':
           <td style="text-align: center;vertical-align:middle;width:100%"><img class="img-fluid img-thumbnail" src="{{row[key]}}" style="max-width:35px;" /></td>
 %       elif key == 'yahoo_url':

@@ -44,12 +44,20 @@ def stock(symbol):
         .first()
     )
 
+    profile = (
+        db.table("company_profiles")
+        .select("company_profiles.*")
+        .join("stocks", "stocks.id", "=", "company_profiles.stock_id")
+        .where("stocks.symbol", "=", symbol)
+        .first()
+    )
+
     prices = (
         db.table("daily_prices")
         .select("date", "open", "high", "low", "close", "volume")
         .join("stocks", "stocks.id", "=", "daily_prices.stock_id")
         .where("stocks.symbol", "=", symbol)
-        .limit(5)
+        .limit(10)
         .order_by("date", "desc")
         .get()
     )
@@ -57,7 +65,6 @@ def stock(symbol):
     dcf = (
         db.table("discounted_cash_flows")
         .select(
-            "stocks.symbol",
             "last_date",
             "discount_rate",
             "discounted_cash_flows",
@@ -77,6 +84,7 @@ def stock(symbol):
         annual=annual,
         prices=prices,
         dcf=dcf,
+        profile=profile,
     )
 
 
