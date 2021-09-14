@@ -21,10 +21,18 @@
           <td><a href="{{row[key]}}" target="_blank">website</a></td>
 %       elif key == 'yahoo_url':
           <td><a href="{{row[key]}}" target="_blank">yahoo</a></td>
-%       elif key in ['return_on_investment','rate_of_return', 'cagr', 'return_on_retained_earnings', 'earnings_growth']:
-          <td>{{f"{round(float(row[key]) * 100.0, 2)}%"}}</td>
-%       elif key in ['open', 'close', 'high', 'low']:
-          <td>{{"${:,.2f}".format(row[key])}}</td>
+%       elif key in ['return_on_investment', 'annual_return', 'rate_of_return', 'cagr', 'return_on_retained_earnings', 'earnings_growth', 'validation_cagr', 'estimated_rate_of_return', 'margin']:
+%         if row[key]:
+              <td>{{f"{round(float(row[key]) * 100.0, 2)}%"}}</td>
+%         else:
+              <td>N/A</td>
+%         end
+%       elif key in ['open', 'close', 'high', 'low', 'eps', 'eps_1y', 'eps_5y', 'eps_10y', 'share_price', 'estimated_eps', 'estimated_price', 'dcf_price']:
+%         if row[key]:
+              <td>{{"${:,.2f}".format(row[key])}}</td>
+%         else:
+              <td>N/A</td>
+%         end
 %       else:
          <td title="{{key}}">{{row[key]}}</td>
 %       end
