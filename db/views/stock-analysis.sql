@@ -473,6 +473,7 @@ CREATE VIEW stock_buffettology AS (
             averages.company_name,
             company_profiles.url,
             'https://finance.yahoo.com/quote/' || averages.symbol AS yahoo_url,
+            company_profiles.logo_url,
             averages.market_capitalization AS market_cap,
             averages.sector,
             averages.industry,
@@ -547,6 +548,7 @@ DROP VIEW IF EXISTS stock_simple_analysis;
 CREATE VIEW stock_simple_analysis AS (
     SELECT
         sb.symbol,
+        logo_url,
         company_name company,
         industry,
         last_report_date reported_date,

@@ -54,6 +54,20 @@ def stock(symbol):
         .get()
     )
 
+    dcf = (
+        db.table("discounted_cash_flows")
+        .select(
+            "stocks.symbol",
+            "last_date",
+            "discount_rate",
+            "discounted_cash_flows",
+            "discounted_share_price",
+        )
+        .join("stocks", "stocks.id", "=", "discounted_cash_flows.stock_id")
+        .where("stocks.symbol", "=", symbol)
+        .first()
+    )
+
     return template(
         "stock",
         symbol=symbol,
@@ -62,6 +76,7 @@ def stock(symbol):
         stats=stats,
         annual=annual,
         prices=prices,
+        dcf=dcf,
     )
 
 
