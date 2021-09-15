@@ -40,6 +40,13 @@ def stock(symbol):
         .get()
     )
 
+    quarters = (
+        db.table("stock_quarterly_report")
+        .where("symbol", "=", symbol)
+        .order_by("date", "desc")
+        .get()
+    )
+
     stats = (
         db.table("statistics")
         .select("statistics.*")
@@ -89,6 +96,7 @@ def stock(symbol):
         prices=prices,
         dcf=dcf,
         profile=profile,
+        quarters=quarters,
     )
 
 

@@ -2,6 +2,7 @@ DROP VIEW IF EXISTS stock_simple_analysis;
 DROP VIEW IF EXISTS stock_buffettology;
 DROP MATERIALIZED VIEW IF EXISTS stock_annual_averages;
 DROP MATERIALIZED VIEW IF EXISTS stock_annual_report;
+DROP MATERIALIZED VIEW IF EXISTS stock_quarterly_report;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report_with_growth;
 DROP MATERIALIZED VIEW IF EXISTS stock_general_report;
 DROP AGGREGATE median(anyelement);
@@ -322,6 +323,17 @@ CREATE MATERIALIZED VIEW stock_general_report_with_growth AS (
     cash_flow_per_share,
     has_errors
   FROM stock_general_report
+);
+
+DROP MATERIALIZED VIEW IF EXISTS stock_quarterly_report;
+CREATE MATERIALIZED VIEW stock_quarterly_report AS (
+    SELECT
+        *,
+        SUM(dividends_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_dividends_per_share,
+        SUM(earnings_per_share) OVER (PARTITION BY stock_id, symbol ORDER BY stock_id, date asc) as accum_eps
+    FROM stock_general_report_with_growth
+    WHERE type = 'Q'
+    ORDER BY symbol, date asc
 );
 
 DROP MATERIALIZED VIEW IF EXISTS stock_annual_report;
