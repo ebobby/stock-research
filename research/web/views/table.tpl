@@ -42,7 +42,7 @@
 %         else:
               <td>N/A</td>
 %         end
-%       elif key in ['open', 'close', 'high', 'low', 'eps', 'eps_1y', 'eps_5y', 'eps_10y', 'share_price', 'estimated_eps', 'estimated_price', 'dcf_price', 'discounted_cash_flows', 'discounted_share_price']:
+%       elif key in ['open', 'close', 'high', 'low', 'eps', 'eps_1y', 'eps_5y', 'eps_10y', 'share_price', 'estimated_eps', 'estimated_price', 'dcf_price', 'discounted_cash_flows', 'discounted_share_price', 'price', 'discounted_price']:
 %         if row[key]:
               <td>{{"${:,.2f}".format(row[key])}}</td>
 %         else:

@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS stock_dcf_analysis;
 DROP VIEW IF EXISTS stock_simple_analysis;
 DROP VIEW IF EXISTS stock_buffettology;
 DROP MATERIALIZED VIEW IF EXISTS stock_annual_averages;
@@ -595,4 +596,33 @@ CREATE VIEW stock_simple_analysis AS (
       AND median_equity_growth > 0
       AND median_earnings_growth > 0
       AND return_on_retained_earnings > 0
+);
+
+DROP VIEW IF EXISTS stock_dcf_analysis;
+CREATE VIEW stock_dcf_analysis AS (
+    SELECT
+        s.symbol,
+        cp.name,
+        cp.industry,
+        dcf.discount_rate,
+        dp.price,
+        dcf.discounted_share_price discounted_price,
+        ROUND((dcf.discounted_share_price / dp.price) - 1, 3) margin
+    FROM discounted_cash_flows dcf
+        INNER JOIN (
+              SELECT
+                  stock_id,
+                  adjusted_close price,
+                  date
+              FROM daily_prices
+        ) dp ON dp.stock_id = dcf.stock_id
+        INNER JOIN (
+            SELECT stock_id, MAX(date) max_date FROM daily_prices GROUP BY stock_id
+        ) dp2 ON dp2.stock_id = dp.stock_id AND dp2.max_date = dp.date
+        INNER JOIN stocks s ON s.id = dcf.stock_id
+        INNER JOIN company_profiles cp ON s.id = cp.stock_id
+    WHERE dcf.discounted_share_price > dp.price
+      AND dcf.discounted_share_price <> 'NAN'::DECIMAL
+      AND dcf.stock_id NOT IN (SELECT DISTINCT stock_id FROM errors)
+    ORDER BY s.symbol, dcf.discount_rate DESC
 );

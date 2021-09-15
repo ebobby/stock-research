@@ -27,6 +27,12 @@ def index():
     return template("index", rows=rows)
 
 
+@app.route("/dcf")
+def dcf():
+    rows = db.table("stock_dcf_analysis").get()
+    return template("dcf.tpl", rows=rows)
+
+
 @app.route("/stock/<symbol>")
 def stock(symbol):
     averages = db.table("stock_annual_averages").where("symbol", "=", symbol).first()
