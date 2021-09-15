@@ -83,7 +83,7 @@ def stock(symbol):
         )
         .join("stocks", "stocks.id", "=", "discounted_cash_flows.stock_id")
         .where("stocks.symbol", "=", symbol)
-        .first()
+        .get()
     )
 
     return template(

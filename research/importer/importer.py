@@ -693,14 +693,38 @@ def refresh_views():
 
 
 def discounted_cash_flows():
-    DISCOUNT_RATE = 0.15
-    PERPETUAL_GROWTH = 0.03
+    def calculate_dcf(row, discount, perpetual_growth):
+        cash_flow = float(row["cash_flow"]) * 1000000
+        growth = float(row["cagr"])
+        shares = float(row["shares_outstanding"])
+
+        dcf = DiscountedCashFlow()
+
+        accum = 0
+        current_cf = cash_flow
+        i = 0
+        for i, mult in enumerate(
+            [growth] * 3 + [growth * 0.75] * 2 + [growth * 0.5] * 5
+        ):
+            current_cf = current_cf * (1.0 + mult)
+            accum += current_cf / math.pow(1 + discount, i + 1)
+
+        accum += (
+            current_cf / (discount - perpetual_growth) / math.pow(1 + discount, i + 1)
+        )
+
+        dcf.stock_id = row["stock_id"]
+        dcf.last_date = row["date"]
+        dcf.discount_rate = discount
+        dcf.discounted_cash_flows = round(accum, 3)
+        dcf.discounted_share_price = round(accum / shares, 3)
+
+        dcf.save()
 
     rows = (
         db.table("stock_buffettology")
         .select(
             "stock_annual_report.stock_id",
-            "stock_annual_report.symbol",
             "stock_annual_report.cash_flow",
             "stock_annual_report.shares_outstanding",
             "stock_annual_report.date",
@@ -721,43 +745,14 @@ def discounted_cash_flows():
     )
 
     logger = logging.getLogger("stock discounted cash flows")
-
     logger.info("Generating stock discounted cash flows")
+
+    db.table("discounted_cash_flows").delete()
 
     saved = 0
     for row in rows:
-        dcf = (
-            DiscountedCashFlow.where("stock_id", row["stock_id"]).first()
-            or DiscountedCashFlow()
-        )
-
-        cash_flow = float(row["cash_flow"]) * 1000000
-        growth = float(row["cagr"])
-
-        accum = 0
-        current_cf = cash_flow
-        for i, mult in enumerate(
-            [growth] * 3 + [growth * 0.75] * 2 + [growth * 0.5] * 5
-        ):
-            current_cf = current_cf * (1.0 + mult)
-            accum += current_cf / math.pow(1 + DISCOUNT_RATE, i + 1)
-
-        accum += (
-            current_cf
-            / (DISCOUNT_RATE - PERPETUAL_GROWTH)
-            / math.pow(1 + DISCOUNT_RATE, i + 1)
-        )
-
-        discounted_share_price = accum / float(row["shares_outstanding"])
-
-        dcf.stock_id = row["stock_id"]
-        dcf.symbol = row["symbol"]
-        dcf.last_date = row["date"]
-        dcf.discount_rate = DISCOUNT_RATE
-        dcf.discounted_cash_flows = round(accum, 3)
-        dcf.discounted_share_price = round(discounted_share_price, 3)
-
-        dcf.save()
+        calculate_dcf(row, discount=0.12, perpetual_growth=0.03)
+        calculate_dcf(row, discount=0.15, perpetual_growth=0.03)
         saved += 1
 
     logger.info(f"Stock discounted cash flows finished, saved={saved}")

@@ -582,7 +582,7 @@ CREATE VIEW stock_simple_analysis AS (
         estimated_price_min_pe AS estimated_price
     FROM stock_buffettology sb
         LEFT OUTER JOIN discounted_cash_flows dcf ON
-             dcf.stock_id = sb.stock_id
+             dcf.stock_id = sb.stock_id AND dcf.discount_rate = 0.15
     WHERE earnings_trend > 0
       AND eps_cagr_10y > 0
       AND eps_cagr_10y <> 'NAN'::decimal

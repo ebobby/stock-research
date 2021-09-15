@@ -64,7 +64,7 @@
         </div>
         <div class="col-6">
           <h5>Discounted Cash Flow</h5>
-          % include('table.tpl', rows=[dcf], scroll=False)
+          % include('table.tpl', rows=dcf, scroll=False)
         </div>
       </div>
     </div>
