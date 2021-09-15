@@ -10,7 +10,6 @@ class StockDiscountedCashFlows(Migration):
             table.big_increments("id")
             table.integer("stock_id").unsigned()
             table.date("last_date")
-            table.text("symbol")
             table.decimal("discount_rate", 20, 5)
             table.decimal("discounted_cash_flows", 25, 5)
             table.decimal("discounted_share_price", 20, 5)
@@ -20,7 +19,7 @@ class StockDiscountedCashFlows(Migration):
 
             # Indexes
             table.foreign("stock_id").references("id").on("stocks")
-            table.unique("stock_id")
+            table.index("stock_id")
 
     def down(self):
         """

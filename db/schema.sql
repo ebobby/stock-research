@@ -245,7 +245,6 @@ CREATE TABLE public.discounted_cash_flows (
     id bigint NOT NULL,
     stock_id integer NOT NULL,
     last_date date NOT NULL,
-    symbol text NOT NULL,
     discount_rate numeric(20,5) NOT NULL,
     discounted_cash_flows numeric(25,5) NOT NULL,
     discounted_share_price numeric(20,5) NOT NULL,
@@ -609,14 +608,6 @@ ALTER TABLE ONLY public.discounted_cash_flows
 
 
 --
--- Name: discounted_cash_flows discounted_cash_flows_stock_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.discounted_cash_flows
-    ADD CONSTRAINT discounted_cash_flows_stock_id_unique UNIQUE (stock_id);
-
-
---
 -- Name: errors errors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -677,6 +668,13 @@ ALTER TABLE ONLY public.stocks
 --
 
 CREATE INDEX daily_prices_date_index ON public.daily_prices USING btree (date);
+
+
+--
+-- Name: discounted_cash_flows_stock_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX discounted_cash_flows_stock_id_index ON public.discounted_cash_flows USING btree (stock_id);
 
 
 --
