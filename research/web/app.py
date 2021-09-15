@@ -73,7 +73,7 @@ def stock(symbol):
         .get()
     )
 
-    dcf = (
+    dcfs = (
         db.table("discounted_cash_flows")
         .select(
             "last_date",
@@ -94,7 +94,7 @@ def stock(symbol):
         stats=stats,
         annual=annual,
         prices=prices,
-        dcf=dcf,
+        dcfs=dcfs,
         profile=profile,
         quarters=quarters,
     )
