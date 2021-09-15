@@ -621,8 +621,18 @@ CREATE VIEW stock_dcf_analysis AS (
         ) dp2 ON dp2.stock_id = dp.stock_id AND dp2.max_date = dp.date
         INNER JOIN stocks s ON s.id = dcf.stock_id
         INNER JOIN company_profiles cp ON s.id = cp.stock_id
+        INNER JOIN (
+            SELECT
+                stock_id,
+                currency,
+                RANK() OVER (PARTITION BY stock_id, report_type ORDER BY stock_id, report_type, report_date DESC) AS rank
+            FROM income_statements
+            WHERE report_type = 'Y'
+        ) currencies ON currencies.stock_id = s.id AND currencies.rank = 1
     WHERE dcf.discounted_share_price > dp.price
       AND dcf.discounted_share_price <> 'NAN'::DECIMAL
       AND dcf.stock_id NOT IN (SELECT DISTINCT stock_id FROM errors)
+      AND currencies.currency = 'USD'
+      AND category ILIKE '%domestic%'
     ORDER BY s.symbol, dcf.discount_rate DESC
 );
