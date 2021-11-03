@@ -573,7 +573,6 @@ CREATE VIEW stock_simple_analysis AS (
         rate_of_return,
         return_on_retained_earnings,
         LEAST(eps_cagr_10y, eps_cagr_5y, eps_cagr_9y) cagr,
-        ROUND(LEAST(eps_cagr_10y, eps_cagr_5y) / eps_cagr_9y, 2) validation,
         median_earnings_growth earnings_growth,
         pe_ratio,
         avg_pe_ratio,

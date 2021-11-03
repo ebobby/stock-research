@@ -19,8 +19,6 @@ def index():
     rows = (
         db.table("stock_simple_analysis")
         .where("annual_return", ">=", float(annual_return))
-        .where("validation", "<", 1.50)
-        .where("validation", ">", 0.0)
         .order_by("annual_return", "DESC")
         .get()
     )

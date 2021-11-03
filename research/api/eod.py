@@ -62,13 +62,21 @@ class EOD:
         todate="",
     ):
         """End-of-day data feed."""
+        dates = {}
+
+        if fromdate:
+            dates["from"] = fromdate
+
+        if todate:
+            dates["to"] = todate
+
         return self._call_api(
             "eod",
             f"{symbol.upper()}.{exchange.upper()}",
             period=period,
             order=order,
-            **{"from": fromdate, "to": todate},
             fmt="json",
+            **dates,
         )
 
     def fundamentals(self, symbol, exchange="US"):
