@@ -2,9 +2,12 @@ black
 debugpy
 ipython
 isort
-jedi==0.17.2
+mccabe
+pycodestyle
+pyflakes
 pylint
-pyls-black
-pyls-isort
+pylsp-rope
 pytest
-python-language-server>=0.36.2
+python-lsp-black
+python-lsp-server
+rope
