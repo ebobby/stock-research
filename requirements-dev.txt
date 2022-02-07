@@ -1,5 +1,6 @@
 black
 debugpy
+docker-compose
 ipython
 isort
 mccabe

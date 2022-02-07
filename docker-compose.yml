@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: stocks
+      POSTGRES_PASSWORD: stocks
+      POSTGRES_DB: stock-research
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - stock-data:/var/lib/postgresql/data
+volumes:
+  stock-data: {}

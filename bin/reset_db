@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #; -*- mode: sh;-*-
 
-dropdb   -U stocks -h localhost stock-research
-createdb -U stocks -h localhost stock-research
-psql     -U stocks -h localhost stock-research < db/schema.sql
+PGPASSWORD=stocks dropdb   -U stocks -h localhost stock-research
+PGPASSWORD=stocks createdb -U stocks -h localhost stock-research
+psql postgresql://stocks:stocks@localhost:5432/stock-research < db/schema.sql

@@ -1,5 +1,4 @@
-from orator import DatabaseManager
-from orator import Model
+from orator import DatabaseManager, Model
 
 config = {
     "stock-research": {
@@ -7,7 +6,7 @@ config = {
         "host": "localhost",
         "database": "stock-research",
         "user": "stocks",
-        "password": "research",
+        "password": "stocks",
         "prefix": "",
         "log_queries": True,
     }

@@ -4,4 +4,4 @@ databases:
     host: localhost
     database: stock-research
     user: stocks
-    password: research
+    password: stocks
