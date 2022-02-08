@@ -3,19 +3,33 @@
 name: stock-research
 root: ~/Projects/stock-research/
 
+on_project_stop:
+  - docker-compose stop
+
 windows:
-  - repl:
-      - source venv/bin/activate
-      - clear
-      - ipython
-  - sql:
-      - source venv/bin/activate
-      - clear
-      - bin/dbconsole
+  - app:
+      layout: even-horizontal
+      panes:
+        - repl:
+          - source env/bin/activate
+          - clear
+          - ipython
+        - web:
+          - source env/bin/activate
+          - clear
+          - python -m research.web.app
+  - db:
+      layout: even-horizontal
+      panes:
+        - sql:
+          - source env/bin/activate
+          - sleep 2
+          - clear
+          - bin/dbconsole
+        - server:
+          - source env/bin/activate
+          - clear
+          - docker-compose up postgres
   - console:
-      - source venv/bin/activate
+      - source env/bin/activate
       - clear
-  - web:
-      - source venv/bin/activate
-      - clear
-      - python -m research.web.app
