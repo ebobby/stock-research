@@ -2,6 +2,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:13
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_duration=on"]
     environment:
       POSTGRES_USER: stocks
       POSTGRES_PASSWORD: stocks
