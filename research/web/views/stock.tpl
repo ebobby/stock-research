@@ -23,9 +23,6 @@
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="annual-tab" data-bs-toggle="tab" data-bs-target="#annual" type="button" role="tab" aria-controls="annual" aria-selected="false">Annual Performance</button>
   </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="quarter-tab" data-bs-toggle="tab" data-bs-target="#quarter" type="button" role="tab" aria-controls="quarter" aria-selected="false">Quarterly Performance</button>
-  </li>
 </ul>
 <div class="tab-content" id="myTabContent" style="padding-top: 20px;">
   <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -71,8 +68,5 @@
   </div>
   <div class="tab-pane fade" id="annual" role="tabpanel" aria-labelledby="annual-tab">
     % include('table.tpl', rows=annual)
-  </div>
-  <div class="tab-pane fade" id="quarter" role="tabpanel" aria-labelledby="quarter-tab">
-    % include('table.tpl', rows=quarters)
   </div>
 </div>

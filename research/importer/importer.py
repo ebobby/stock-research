@@ -115,9 +115,6 @@ def fundamentals():
                     _process_income_statements(
                         stock, "Y", list(ic_statements["yearly"].values()), logger
                     )
-                    _process_income_statements(
-                        stock, "Q", list(ic_statements["quarterly"].values()), logger
-                    )
                 else:
                     stock.add_error("No income statements found.", "eod")
                     logger.warning(f"No income statements for {stock.symbol}.")
@@ -127,9 +124,6 @@ def fundamentals():
                     _process_balance_sheets(
                         stock, "Y", list(b_sheets["yearly"].values()), logger
                     )
-                    _process_balance_sheets(
-                        stock, "Q", list(b_sheets["quarterly"].values()), logger
-                    )
                 else:
                     stock.add_error("No balance sheets found.", "eod")
                     logger.warning(f"No balance sheets for {stock.symbol}.")
@@ -138,9 +132,6 @@ def fundamentals():
                 if cf_statements:
                     _process_cash_flow_statements(
                         stock, "Y", list(cf_statements["yearly"].values()), logger
-                    )
-                    _process_cash_flow_statements(
-                        stock, "Q", list(cf_statements["quarterly"].values()), logger
                     )
                 else:
                     stock.add_error("No cash flow statements found.", "eod")
@@ -666,13 +657,6 @@ def _needs_fundamentals(stock: Stock, logger: logging):
         .first()
     )
 
-    last_quarter = (
-        stock.cash_flow_statements()
-        .where("report_type", "Q")
-        .order_by("report_date", "DESC")
-        .first()
-    )
-
     if not last_year:
         needs.append("has no annual reports")
         result = True
@@ -680,17 +664,6 @@ def _needs_fundamentals(stock: Stock, logger: logging):
         needs.append(
             "last annual report was filed {} days ago".format(
                 (date.today() - last_year.report_date).days
-            )
-        )
-        result = True
-
-    if not last_quarter:
-        needs.append("has no quarterly reports")
-        result = True
-    elif (date.today() - last_quarter.report_date).days > QUARTER_EARNINGS_PAST_DAYS:
-        needs.append(
-            "last quarter report was filed {} days ago".format(
-                (date.today() - last_quarter.report_date).days
             )
         )
         result = True
