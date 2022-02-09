@@ -1,12 +1,12 @@
-black
 debugpy
 docker-compose
+flake8
 ipython
-isort
 mccabe
 pycodestyle
 pyflakes
 pylint
+pyls-isort
 pylsp-rope
 pytest
 python-lsp-black
