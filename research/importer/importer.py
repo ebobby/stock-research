@@ -8,17 +8,13 @@ from datetime import date, datetime
 
 from research.api import EOD
 from research.db.config import db
-from research.db.model import (
-    BalanceSheet,
-    CashFlowStatement,
-    CompanyProfile,
-    DailyPrice,
-    IncomeStatement,
-    Statistics,
-    Stock,
-    DiscountedCashFlow,
-)
+from research.db.model import (BalanceSheet, CashFlowStatement, CompanyProfile,
+                               DailyPrice, DiscountedCashFlow, IncomeStatement,
+                               Statistics, Stock)
 from research.utils import parse
+
+ANNUAL_EARNINGS_PAST_DAYS = 365 + 90
+QUARTER_EARNINGS_PAST_DAYS = 90 + 45
 
 logging.basicConfig(
     level=logging.INFO,
@@ -104,7 +100,7 @@ def fundamentals():
     processed = 0
 
     for i, stock in enumerate(stocks):
-        if _needs_fundamentals(stock):
+        if _needs_fundamentals(stock, logger):
             # Remove all errors, we're gonna process everything again anyway.
             stock.errors().delete()
 
@@ -648,13 +644,20 @@ def _process_company_stats(stock, response, logger):
         stock.statistics().save(stats)
 
 
-def _needs_fundamentals(stock):
+def _needs_fundamentals(stock: Stock, logger: logging):
     if not stock or not stock.exists:
         return False
 
     result = False
+    needs = []
 
-    result |= not stock.company_profile or not stock.statistics
+    if not stock.company_profile:
+        needs.append("has no profile")
+        result = True
+
+    if not stock.statistics:
+        needs.append("has no statistics")
+        result = True
 
     last_year = (
         stock.cash_flow_statements()
@@ -670,8 +673,30 @@ def _needs_fundamentals(stock):
         .first()
     )
 
-    result |= not last_year or (date.today() - last_year.report_date).days > 365
-    result |= not last_quarter or (date.today() - last_quarter.report_date).days > 90
+    if not last_year:
+        needs.append("has no annual reports")
+        result = True
+    elif (date.today() - last_year.report_date).days > ANNUAL_EARNINGS_PAST_DAYS:
+        needs.append(
+            "last annual report was filed {} days ago".format(
+                (date.today() - last_year.report_date).days
+            )
+        )
+        result = True
+
+    if not last_quarter:
+        needs.append("has no quarterly reports")
+        result = True
+    elif (date.today() - last_quarter.report_date).days > QUARTER_EARNINGS_PAST_DAYS:
+        needs.append(
+            "last quarter report was filed {} days ago".format(
+                (date.today() - last_quarter.report_date).days
+            )
+        )
+        result = True
+
+    if result:
+        logger.info(f"Pulling stock {stock.symbol_for_api}: {', '.join(needs)}.")
 
     return result
 
