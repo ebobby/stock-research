@@ -73,7 +73,7 @@ def stocks():
         stock.country = ticker["Country"]
         stock.currency = ticker["Currency"]
         stock.exchange = ticker["Exchange"]
-        stock.active = True
+        stock.active = not stock.attributes_to_dict().get('force_inactive', False)
         stock.source = "eod"
         stock.save()
 

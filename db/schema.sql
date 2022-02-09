@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
--- Dumped by pg_dump version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
+-- Dumped from database version 13.5 (Debian 13.5-1.pgdg110+1)
+-- Dumped by pg_dump version 13.5 (Ubuntu 13.5-0ubuntu0.21.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -448,7 +448,8 @@ CREATE TABLE public.stocks (
     active boolean NOT NULL,
     source text NOT NULL,
     created_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
-    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL
+    updated_at timestamp(6) without time zone DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,
+    force_inactive boolean DEFAULT false NOT NULL
 );
 
 
@@ -756,8 +757,8 @@ ALTER TABLE ONLY public.statistics
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
--- Dumped by pg_dump version 13.4 (Ubuntu 13.4-0ubuntu0.21.04.1)
+-- Dumped from database version 13.5 (Debian 13.5-1.pgdg110+1)
+-- Dumped by pg_dump version 13.5 (Ubuntu 13.5-0ubuntu0.21.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -783,6 +784,7 @@ INSERT INTO public.migrations VALUES ('2021_05_25_035928_create_companies_table'
 INSERT INTO public.migrations VALUES ('2021_05_27_210259_create_table_data_errors', 5);
 INSERT INTO public.migrations VALUES ('2021_06_03_044026_create_statistics_table', 6);
 INSERT INTO public.migrations VALUES ('2021_09_13_050445_stock_discounted_cash_flows', 7);
+INSERT INTO public.migrations VALUES ('2022_02_09_033555_stocks_add_manually_override', 8);
 
 
 --
