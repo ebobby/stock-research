@@ -73,7 +73,7 @@ def stocks():
         stock.country = ticker["Country"]
         stock.currency = ticker["Currency"]
         stock.exchange = ticker["Exchange"]
-        stock.active = not stock.attributes_to_dict().get('force_inactive', False)
+        stock.active = not stock.attributes_to_dict().get("force_inactive", False)
         stock.source = "eod"
         stock.save()
 
@@ -660,13 +660,22 @@ def _needs_fundamentals(stock: Stock, logger: logging):
     if not last_year:
         needs.append("has no annual reports")
         result = True
-    elif (date.today() - last_year.report_date).days > ANNUAL_EARNINGS_PAST_DAYS:
-        needs.append(
-            "last annual report was filed {} days ago".format(
-                (date.today() - last_year.report_date).days
+    else:
+        days = (date.today() - last_year.report_date).days
+
+        # Stock is probably dead.
+        if days > 1000:
+            stock.force_inactive = True
+            stock.active = False
+            stock.save()
+            logger.info(
+                f"Stock {stock.symbol_for_api} last report was {days} ago. Deactivating."
             )
-        )
-        result = True
+            return False
+
+        if days > ANNUAL_EARNINGS_PAST_DAYS:
+            needs.append("last annual report was filed {} days ago".format(days))
+            result = True
 
     if result:
         logger.info(f"Pulling stock {stock.symbol_for_api}: {', '.join(needs)}.")
