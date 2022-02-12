@@ -693,15 +693,15 @@ def refresh_views():
     db.connection().statement(
         "REFRESH MATERIALIZED VIEW stock_general_report_with_growth"
     )
-    db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_report")
-    db.connection().statement("REFRESH MATERIALIZED VIEW stock_annual_averages")
+    db.connection().statement("REFRESH MATERIALIZED VIEW stock_5y_report")
+    db.connection().statement("REFRESH MATERIALIZED VIEW stock_5y_averages")
 
     logger.info("Finished refreshing database views")
 
 
 def discounted_cash_flows():
     def calculate_dcf(row, discount, perpetual_growth):
-        cash_flow = float(row["cash_flow"]) * 1000000
+        cash_flow = float(row["free_cash_flow"]) * 1000000
         growth = float(row["cagr"])
         shares = float(row["shares_outstanding"])
 
@@ -723,31 +723,29 @@ def discounted_cash_flows():
         dcf.stock_id = row["stock_id"]
         dcf.last_date = row["date"]
         dcf.discount_rate = discount
-        dcf.discounted_cash_flows = round(accum, 3)
+        dcf.discounted_cash_flows = round(accum/1000000, 3)
         dcf.discounted_share_price = round(accum / shares, 3)
 
         dcf.save()
 
     rows = (
-        db.table("stock_buffettology")
+        db.table("stock_buffettology_report")
         .select(
-            "stock_annual_report.stock_id",
-            "stock_annual_report.cash_flow",
-            "stock_annual_report.shares_outstanding",
-            "stock_annual_report.date",
+            "stock_5y_report.stock_id",
+            "stock_5y_report.free_cash_flow",
+            "stock_5y_report.shares_outstanding",
+            "stock_5y_report.date",
         )
-        .select_raw(
-            "LEAST(stock_buffettology.eps_cagr_10y, stock_buffettology.eps_cagr_5y, stock_buffettology.eps_cagr_9y) cagr"
-        )
+        .select_raw("stock_buffettology_report.free_cash_flow_cagr_5y cagr")
         .join(
-            "stock_annual_report",
-            "stock_annual_report.stock_id",
+            "stock_5y_report",
+            "stock_5y_report.stock_id",
             "=",
-            "stock_buffettology.stock_id",
+            "stock_buffettology_report.stock_id",
         )
-        .where("stock_annual_report.has_errors", "=", "f")
-        .where("stock_annual_report.shares_outstanding", "<>", 0)
-        .where("stock_annual_report.report_number", "=", 1)
+        .where("stock_5y_report.has_errors", "=", "f")
+        .where("stock_5y_report.shares_outstanding", "<>", 0)
+        .where("stock_5y_report.report_number", "=", 1)
         .get()
     )
 

@@ -33,12 +33,12 @@ def dcf():
 
 @app.route("/stock/<symbol>")
 def stock(symbol):
-    averages = db.table("stock_annual_averages").where("symbol", "=", symbol).first()
+    averages = db.table("stock_5y_averages").where("symbol", "=", symbol).first()
 
-    buffettology = db.table("stock_buffettology").where("symbol", "=", symbol).first()
+    buffettology = db.table("stock_buffettology_report").where("symbol", "=", symbol).first()
 
     annual = (
-        db.table("stock_annual_report")
+        db.table("stock_5y_report")
         .where("symbol", "=", symbol)
         .order_by("date", "desc")
         .get()
@@ -65,7 +65,7 @@ def stock(symbol):
         .select("date", "open", "high", "low", "close", "volume")
         .join("stocks", "stocks.id", "=", "daily_prices.stock_id")
         .where("stocks.symbol", "=", symbol)
-        .limit(10)
+        .limit(30)
         .order_by("date", "desc")
         .get()
     )
